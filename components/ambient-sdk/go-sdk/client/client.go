@@ -8,286 +8,273 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/ambient-code/platform/components/ambient-sdk/go-sdk/types"
 )
 
-// Client is a simple HTTP client for the Ambient Platform API
+type ClientOption func(*Client)
+
 type Client struct {
 	baseURL    string
-	token      types.SecureToken
+	basePath   string
+	token      SecureToken
 	project    string
 	httpClient *http.Client
 	logger     *slog.Logger
 }
 
-// NewClient creates a new HTTP client for the Ambient Platform
-// Returns an error if token validation fails
-func NewClient(baseURL, token, project string) (*Client, error) {
-	return NewClientWithTimeout(baseURL, token, project, 30*time.Second)
-}
-
-// NewClientWithTimeout creates a new HTTP client with custom timeout
-// Returns an error if token validation fails
-func NewClientWithTimeout(baseURL, token, project string, timeout time.Duration) (*Client, error) {
-	secureToken := types.SecureToken(token)
+func NewClient(baseURL, token, project string, opts ...ClientOption) (*Client, error) {
+	secureToken := SecureToken(token)
 	if err := secureToken.IsValid(); err != nil {
 		return nil, fmt.Errorf("invalid token: %w", err)
 	}
-	
-	// Create logger with ReplaceAttr for additional sensitive data protection
+
+	if project == "" {
+		return nil, fmt.Errorf("project cannot be empty")
+	}
+
 	logger := slog.New(slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
 		ReplaceAttr: sanitizeLogAttrs,
 	}))
-	
-	client := &Client{
-		baseURL: baseURL,
-		token:   secureToken,
-		project: project,
+
+	c := &Client{
+		baseURL:  strings.TrimRight(baseURL, "/"),
+		basePath: "/api/ambient-api-server/v1",
+		token:    secureToken,
+		project:  project,
 		httpClient: &http.Client{
-			Timeout: timeout,
+			Timeout: 30 * time.Second,
 		},
 		logger: logger,
 	}
-	
-	// Log client creation (without any sensitive data)
-	client.logger.Info("Ambient client created",
-		"base_url", baseURL,
-		"project", project,
-		"timeout", timeout)
-	
-	return client, nil
+
+	for _, opt := range opts {
+		opt(c)
+	}
+
+	c.logger.Info("ambient client created",
+		"base_url", c.baseURL,
+		"project", c.project)
+
+	return c, nil
 }
 
-// CreateSession creates a new agentic session
-func (c *Client) CreateSession(ctx context.Context, req *types.CreateSessionRequest) (*types.CreateSessionResponse, error) {
-	// Validate the request first
-	if err := req.Validate(); err != nil {
-		c.logger.Error("Session creation failed validation", "error", err)
-		return nil, fmt.Errorf("invalid request: %w", err)
+func NewClientFromEnv(opts ...ClientOption) (*Client, error) {
+	baseURL := os.Getenv("AMBIENT_API_URL")
+	if baseURL == "" {
+		baseURL = "http://localhost:8080"
+	}
+	token := os.Getenv("AMBIENT_TOKEN")
+	if token == "" {
+		return nil, fmt.Errorf("AMBIENT_TOKEN environment variable is required")
+	}
+	project := os.Getenv("AMBIENT_PROJECT")
+	if project == "" {
+		return nil, fmt.Errorf("AMBIENT_PROJECT environment variable is required")
+	}
+	return NewClient(baseURL, token, project, opts...)
+}
+
+func WithBasePath(path string) ClientOption {
+	return func(c *Client) {
+		c.basePath = path
+	}
+}
+
+func WithTimeout(d time.Duration) ClientOption {
+	return func(c *Client) {
+		c.httpClient.Timeout = d
+	}
+}
+
+func WithHTTPClient(hc *http.Client) ClientOption {
+	return func(c *Client) {
+		c.httpClient = hc
+	}
+}
+
+func (c *Client) do(ctx context.Context, method, path string, body []byte, expectedStatus int, result any) error {
+	fullURL := c.baseURL + c.basePath + path
+
+	var bodyReader io.Reader
+	if body != nil {
+		bodyReader = bytes.NewReader(body)
 	}
 
-	c.logger.Info("Creating session", 
-		"task_length", len(req.Task),
-		"model", req.Model,
-		"repo_count", len(req.Repos))
-
-	jsonBody, err := json.Marshal(req)
+	req, err := http.NewRequestWithContext(ctx, method, fullURL, bodyReader)
 	if err != nil {
-		c.logger.Error("Failed to marshal request", "error", err)
-		return nil, fmt.Errorf("failed to marshal request: %w", err)
+		return fmt.Errorf("create request: %w", err)
 	}
 
-	url := c.baseURL + "/v1/sessions"
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(jsonBody))
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+	req.Header.Set("Authorization", "Bearer "+c.token.String())
+	req.Header.Set("X-Ambient-Project", c.project)
+	if body != nil {
+		req.Header.Set("Content-Type", "application/json")
 	}
 
-	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Authorization", "Bearer "+c.token.String())
-	httpReq.Header.Set("X-Ambient-Project", c.project)
-
-	resp, err := c.httpClient.Do(httpReq)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		c.logger.Error("HTTP request failed", "error", err, "url", url)
-		return nil, fmt.Errorf("failed to execute request: %w", err)
+		return fmt.Errorf("execute request: %w", err)
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		c.logger.Error("Failed to read response body", "error", err)
-		return nil, fmt.Errorf("failed to read response body: %w", err)
+		return fmt.Errorf("read response: %w", err)
 	}
 
-	if resp.StatusCode != http.StatusCreated {
-		c.logger.Error("Session creation failed", 
-			"status_code", resp.StatusCode,
-			"response_body_length", len(body))
-		
-		var errResp types.ErrorResponse
-		if json.Unmarshal(body, &errResp) == nil {
-			// Log full error details for debugging (sanitized by slog)
-			c.logger.Debug("API error details", "error", errResp.Error, "message", errResp.Message)
-			// Return generic error message to avoid exposing sensitive details
-			return nil, fmt.Errorf("API error (%d): %s", resp.StatusCode, errResp.Error)
+	if resp.StatusCode != expectedStatus {
+		var apiErr types.APIError
+		if json.Unmarshal(respBody, &apiErr) == nil && apiErr.Code != "" {
+			apiErr.StatusCode = resp.StatusCode
+			return &apiErr
 		}
-		// Don't expose raw response body - return generic error
-		return nil, fmt.Errorf("API error (%d): request failed", resp.StatusCode)
+		return &types.APIError{
+			StatusCode: resp.StatusCode,
+			Code:       http.StatusText(resp.StatusCode),
+			Reason:     fmt.Sprintf("unexpected status %d", resp.StatusCode),
+		}
 	}
 
-	var createResp types.CreateSessionResponse
-	if err := json.Unmarshal(body, &createResp); err != nil {
-		c.logger.Error("Failed to unmarshal response", "error", err)
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	if result != nil && len(respBody) > 0 {
+		if err := json.Unmarshal(respBody, result); err != nil {
+			return fmt.Errorf("unmarshal response: %w", err)
+		}
 	}
 
-	c.logger.Info("Session created successfully", 
-		"session_id", createResp.ID,
-		"status_code", resp.StatusCode)
-
-	return &createResp, nil
+	return nil
 }
 
-// GetSession retrieves a session by ID
-func (c *Client) GetSession(ctx context.Context, sessionID string) (*types.SessionResponse, error) {
-	url := c.baseURL + "/v1/sessions/" + sessionID
-	
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
-	}
-
-	httpReq.Header.Set("Authorization", "Bearer "+c.token.String())
-	httpReq.Header.Set("X-Ambient-Project", c.project)
-
-	resp, err := c.httpClient.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	if resp.StatusCode == http.StatusNotFound {
-		return nil, fmt.Errorf("session not found: %s", sessionID)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		var errResp types.ErrorResponse
-		if json.Unmarshal(body, &errResp) == nil {
-			// Return generic error without exposing full details
-			return nil, fmt.Errorf("API error (%d): %s", resp.StatusCode, errResp.Error)
+func (c *Client) doWithQuery(ctx context.Context, method, path string, body []byte, expectedStatus int, result any, opts *types.ListOptions) error {
+	if opts != nil {
+		params := url.Values{}
+		if opts.Page > 0 {
+			params.Set("page", strconv.Itoa(opts.Page))
 		}
-		return nil, fmt.Errorf("API error (%d): request failed", resp.StatusCode)
+		if opts.Size > 0 {
+			params.Set("size", strconv.Itoa(opts.Size))
+		}
+		if opts.Search != "" {
+			params.Set("search", opts.Search)
+		}
+		if opts.OrderBy != "" {
+			params.Set("orderBy", opts.OrderBy)
+		}
+		if opts.Fields != "" {
+			params.Set("fields", opts.Fields)
+		}
+		if encoded := params.Encode(); encoded != "" {
+			path = path + "?" + encoded
+		}
 	}
-
-	var session types.SessionResponse
-	if err := json.Unmarshal(body, &session); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	return &session, nil
+	return c.do(ctx, method, path, body, expectedStatus, result)
 }
 
-// ListSessions lists all sessions
-func (c *Client) ListSessions(ctx context.Context) (*types.SessionListResponse, error) {
-	url := c.baseURL + "/v1/sessions"
-	
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create request: %w", err)
+type SecureToken string
+
+func (t SecureToken) LogValue() slog.Value {
+	if len(t) == 0 {
+		return slog.StringValue("[EMPTY]")
 	}
-
-	httpReq.Header.Set("Authorization", "Bearer "+c.token.String())
-	httpReq.Header.Set("X-Ambient-Project", c.project)
-
-	resp, err := c.httpClient.Do(httpReq)
-	if err != nil {
-		return nil, fmt.Errorf("failed to execute request: %w", err)
+	if len(t) < 8 {
+		return slog.StringValue("[TOO_SHORT]")
 	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		var errResp types.ErrorResponse
-		if json.Unmarshal(body, &errResp) == nil {
-			// Return generic error without exposing full details
-			return nil, fmt.Errorf("API error (%d): %s", resp.StatusCode, errResp.Error)
-		}
-		return nil, fmt.Errorf("API error (%d): request failed", resp.StatusCode)
-	}
-
-	var listResp types.SessionListResponse
-	if err := json.Unmarshal(body, &listResp); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	return &listResp, nil
+	return slog.StringValue(fmt.Sprintf("%s***(%d chars)", string(t)[:6], len(t)))
 }
 
-// WaitForCompletion polls a session until it reaches a terminal state
-func (c *Client) WaitForCompletion(ctx context.Context, sessionID string, pollInterval time.Duration) (*types.SessionResponse, error) {
-	ticker := time.NewTicker(pollInterval)
-	defer ticker.Stop()
+func (t SecureToken) String() string {
+	return string(t)
+}
 
-	for {
-		select {
-		case <-ctx.Done():
-			return nil, ctx.Err()
-		case <-ticker.C:
-			session, err := c.GetSession(ctx, sessionID)
-			if err != nil {
-				return nil, err
-			}
+func (t SecureToken) IsValid() error {
+	if len(t) == 0 {
+		return fmt.Errorf("token cannot be empty")
+	}
 
-			switch session.Status {
-			case types.StatusCompleted, types.StatusFailed:
-				return session, nil
-			case types.StatusPending, types.StatusRunning:
-				// Continue polling
-				continue
-			default:
-				return nil, fmt.Errorf("unknown session status: %s", session.Status)
+	tokenStr := string(t)
+
+	placeholders := []string{
+		"YOUR_TOKEN_HERE", "your-token-here", "token", "password",
+		"secret", "example", "test", "demo", "placeholder", "TODO",
+	}
+	for _, placeholder := range placeholders {
+		if strings.EqualFold(tokenStr, placeholder) {
+			return fmt.Errorf("token appears to be a placeholder value")
+		}
+	}
+
+	if len(tokenStr) < 10 {
+		return fmt.Errorf("token is too short (minimum 10 characters)")
+	}
+
+	if strings.HasPrefix(tokenStr, "sha256~") {
+		if len(tokenStr) < 20 {
+			return fmt.Errorf("OpenShift token too short")
+		}
+		return nil
+	}
+
+	if strings.Count(tokenStr, ".") == 2 {
+		parts := strings.Split(tokenStr, ".")
+		allValid := true
+		for _, part := range parts {
+			if len(part) == 0 {
+				allValid = false
+				break
 			}
 		}
+		if allValid {
+			return nil
+		}
 	}
+
+	if strings.HasPrefix(tokenStr, "ghp_") || strings.HasPrefix(tokenStr, "gho_") ||
+		strings.HasPrefix(tokenStr, "ghu_") || strings.HasPrefix(tokenStr, "ghs_") {
+		if len(tokenStr) < 40 {
+			return fmt.Errorf("GitHub token too short")
+		}
+		return nil
+	}
+
+	return nil
 }
 
-// sanitizeLogAttrs implements the ReplaceAttr approach for slog
-// This provides a global safety net for any sensitive data that might be logged
 func sanitizeLogAttrs(_ []string, attr slog.Attr) slog.Attr {
 	key := attr.Key
 	value := attr.Value
-	
-	// Sanitize by exact key name (case-sensitive for precision)
+
 	switch key {
-	case "token", "Token", "TOKEN":
-		return slog.String(key, "[REDACTED]")
-	case "password", "Password", "PASSWORD":
-		return slog.String(key, "[REDACTED]")
-	case "secret", "Secret", "SECRET":
-		return slog.String(key, "[REDACTED]")
-	case "apikey", "api_key", "ApiKey", "API_KEY":
-		return slog.String(key, "[REDACTED]")
-	case "authorization", "Authorization", "AUTHORIZATION":
+	case "token", "Token", "TOKEN",
+		"password", "Password", "PASSWORD",
+		"secret", "Secret", "SECRET",
+		"apikey", "api_key", "ApiKey", "API_KEY",
+		"authorization", "Authorization", "AUTHORIZATION":
 		return slog.String(key, "[REDACTED]")
 	}
-	
-	// Sanitize by key patterns (case-insensitive)
+
 	keyLower := strings.ToLower(key)
 	if strings.HasSuffix(keyLower, "_token") || strings.HasSuffix(keyLower, "_password") ||
-	   strings.HasSuffix(keyLower, "_secret") || strings.HasSuffix(keyLower, "_key") {
+		strings.HasSuffix(keyLower, "_secret") || strings.HasSuffix(keyLower, "_key") {
 		return slog.String(key, "[REDACTED]")
 	}
-	
-	// Sanitize by value content ONLY for obvious token patterns
+
 	if value.Kind() == slog.KindString {
 		str := value.String()
-		// Only redact clear Bearer token patterns
 		if strings.HasPrefix(str, "Bearer ") || strings.HasPrefix(str, "bearer ") {
 			return slog.String(key, "[REDACTED_BEARER]")
 		}
-		// Only redact SHA256 tokens (common OpenShift token format)
 		if strings.HasPrefix(str, "sha256~") {
 			return slog.String(key, "[REDACTED_SHA256_TOKEN]")
 		}
-		// Only redact JWT patterns (starts with ey and contains dots)
 		if strings.HasPrefix(str, "ey") && strings.Count(str, ".") >= 2 && len(str) > 50 {
 			return slog.String(key, "[REDACTED_JWT]")
 		}
 	}
-	
+
 	return attr
 }

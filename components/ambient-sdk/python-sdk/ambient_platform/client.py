@@ -1,65 +1,32 @@
-"""
-HTTP client for the Ambient Platform Public API.
-"""
-
-import json
 import os
-import time
 from typing import Optional
 from urllib.parse import urlparse
+
 import httpx
 
-from .types import (
-    SessionResponse,
-    SessionListResponse,
-    CreateSessionRequest,
-    CreateSessionResponse,
-    ErrorResponse,
-    StatusCompleted,
-    StatusFailed,
-)
-from .exceptions import (
-    AmbientAPIError,
-    AmbientConnectionError,
-    SessionNotFoundError,
-    AuthenticationError,
-)
+from ._base import APIError
 
 
 class AmbientClient:
-    """Simple HTTP client for the Ambient Platform API."""
-
     def __init__(
         self,
         base_url: str,
         token: str,
         project: str,
+        *,
+        base_path: str = "/api/ambient-api-server/v1",
         timeout: float = 30.0,
     ):
-        """
-        Initialize the Ambient Platform client.
-
-        Args:
-            base_url: API base URL (e.g., "https://api.ambient-code.io")
-            token: Bearer token for authentication
-            project: Project name (Kubernetes namespace)
-            timeout: HTTP request timeout in seconds
-            
-        Raises:
-            ValueError: If token or other parameters fail validation
-        """
-        # Validate inputs
         self._validate_token(token)
         self._validate_project(project)
         self._validate_base_url(base_url)
-        
-        self.base_url = base_url.rstrip("/")
-        self.token = token
-        self.project = project
-        self.timeout = timeout
-        
-        # Create HTTP client with headers
-        self.client = httpx.Client(
+
+        self._base_url = base_url.rstrip("/")
+        self._base_path = base_path
+        self._token = token
+        self._project = project
+
+        self._http = httpx.Client(
             timeout=timeout,
             headers={
                 "Authorization": f"Bearer {token}",
@@ -68,236 +35,148 @@ class AmbientClient:
             },
         )
 
-    def __enter__(self):
+        self._api_cache: dict = {}
+
+    def __enter__(self) -> "AmbientClient":
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:  # type: ignore[no-untyped-def]
         self.close()
 
-    def close(self):
-        """Close the HTTP client."""
-        self.client.close()
+    def close(self) -> None:
+        self._http.close()
 
-    def _handle_response(self, response: httpx.Response) -> dict:
-        """Handle HTTP response and raise appropriate exceptions."""
-        try:
-            data = response.json()
-        except (json.JSONDecodeError, ValueError):
-            data = {"error": f"Invalid JSON response: {response.text}"}
-
-        if response.status_code == 401:
-            error_msg = data.get("error", "Unauthorized")
-            raise AuthenticationError(f"Authentication failed: {error_msg}")
-        elif response.status_code == 404:
-            error_msg = data.get("error", "Not found")
-            raise SessionNotFoundError(error_msg)
-        elif response.status_code >= 400:
-            error_msg = data.get("error", f"HTTP {response.status_code}")
-            message = data.get("message", "")
-            full_msg = f"{error_msg}" + (f" - {message}" if message else "")
-            raise AmbientAPIError(f"API error ({response.status_code}): {full_msg}")
-
-        return data
-
-    def create_session(self, request: CreateSessionRequest) -> CreateSessionResponse:
-        """
-        Create a new agentic session.
-
-        Args:
-            request: Session creation request
-
-        Returns:
-            CreateSessionResponse with session ID and message
-
-        Raises:
-            ValueError: If request validation fails
-            AmbientAPIError: If the API request fails
-            AuthenticationError: If authentication fails
-            AmbientConnectionError: If connection fails
-        """
-        # Validate the request first
-        request.validate()
-        
-        url = f"{self.base_url}/v1/sessions"
-        
-        try:
-            response = self.client.post(url, json=request.to_dict())
-        except httpx.RequestError as e:
-            raise AmbientConnectionError(f"Failed to connect to API: {e}")
-
-        data = self._handle_response(response)
-        return CreateSessionResponse.from_dict(data)
-
-    def get_session(self, session_id: str) -> SessionResponse:
-        """
-        Retrieve a session by ID.
-
-        Args:
-            session_id: Unique session identifier
-
-        Returns:
-            SessionResponse with session details
-
-        Raises:
-            SessionNotFoundError: If session doesn't exist
-            AmbientAPIError: If the API request fails
-            AuthenticationError: If authentication fails
-            AmbientConnectionError: If connection fails
-        """
-        url = f"{self.base_url}/v1/sessions/{session_id}"
-        
-        try:
-            response = self.client.get(url)
-        except httpx.RequestError as e:
-            raise AmbientConnectionError(f"Failed to connect to API: {e}")
-
-        data = self._handle_response(response)
-        return SessionResponse.from_dict(data)
-
-    def list_sessions(self) -> SessionListResponse:
-        """
-        List all accessible sessions.
-
-        Returns:
-            SessionListResponse with session list and total count
-
-        Raises:
-            AmbientAPIError: If the API request fails
-            AuthenticationError: If authentication fails
-            AmbientConnectionError: If connection fails
-        """
-        url = f"{self.base_url}/v1/sessions"
-        
-        try:
-            response = self.client.get(url)
-        except httpx.RequestError as e:
-            raise AmbientConnectionError(f"Failed to connect to API: {e}")
-
-        data = self._handle_response(response)
-        return SessionListResponse.from_dict(data)
-
-    def wait_for_completion(
+    def _request(
         self,
-        session_id: str,
-        poll_interval: float = 5.0,
-        timeout: Optional[float] = None,
-    ) -> SessionResponse:
-        """
-        Poll a session until it reaches a terminal state.
+        method: str,
+        path: str,
+        *,
+        json: Optional[dict] = None,
+        params: Optional[dict] = None,
+        expect_json: bool = True,
+    ) -> dict:
+        url = self._base_url + self._base_path + path
 
-        Args:
-            session_id: Session ID to monitor
-            poll_interval: Time between polls in seconds
-            timeout: Maximum time to wait in seconds (None = no limit)
+        try:
+            resp = self._http.request(method, url, json=json, params=params)
+        except httpx.RequestError as exc:
+            raise ConnectionError(f"request failed: {exc}") from exc
 
-        Returns:
-            SessionResponse when session completes or fails
+        if resp.status_code >= 400:
+            try:
+                data = resp.json()
+            except Exception:
+                data = {}
+            raise APIError(
+                status_code=resp.status_code,
+                code=data.get("code", str(resp.status_code)),
+                reason=data.get("reason", resp.text[:200] if resp.text else ""),
+                operation_id=data.get("operation_id", ""),
+            )
 
-        Raises:
-            TimeoutError: If timeout is reached
-            SessionNotFoundError: If session doesn't exist
-            AmbientAPIError: If the API request fails
-            AmbientConnectionError: If connection fails
-        """
-        start_time = time.time()
-        
-        while True:
-            session = self.get_session(session_id)
-            
-            # Check if session reached terminal state
-            if session.status in (StatusCompleted, StatusFailed):
-                return session
-            
-            # Check timeout
-            if timeout and (time.time() - start_time) > timeout:
-                raise TimeoutError(
-                    f"Session monitoring timed out after {timeout} seconds"
-                )
-            
-            # Wait before next poll
-            time.sleep(poll_interval)
+        if not expect_json:
+            return {}
+
+        return resp.json()  # type: ignore[no-any-return]
+
+    @property
+    def sessions(self):  # type: ignore[no-untyped-def]
+        return self._get_api("sessions")
+
+    @property
+    def agents(self):  # type: ignore[no-untyped-def]
+        return self._get_api("agents")
+
+    @property
+    def tasks(self):  # type: ignore[no-untyped-def]
+        return self._get_api("tasks")
+
+    @property
+    def skills(self):  # type: ignore[no-untyped-def]
+        return self._get_api("skills")
+
+    @property
+    def workflows(self):  # type: ignore[no-untyped-def]
+        return self._get_api("workflows")
+
+    @property
+    def users(self):  # type: ignore[no-untyped-def]
+        return self._get_api("users")
+
+    @property
+    def workflow_skills(self):  # type: ignore[no-untyped-def]
+        return self._get_api("workflow_skills")
+
+    @property
+    def workflow_tasks(self):  # type: ignore[no-untyped-def]
+        return self._get_api("workflow_tasks")
+
+    def _get_api(self, name: str):  # type: ignore[no-untyped-def]
+        if name not in self._api_cache:
+            if name == "sessions":
+                from ._session_api import SessionAPI
+                self._api_cache[name] = SessionAPI(self)
+            elif name == "agents":
+                from ._agent_api import AgentAPI
+                self._api_cache[name] = AgentAPI(self)
+            elif name == "tasks":
+                from ._task_api import TaskAPI
+                self._api_cache[name] = TaskAPI(self)
+            elif name == "skills":
+                from ._skill_api import SkillAPI
+                self._api_cache[name] = SkillAPI(self)
+            elif name == "workflows":
+                from ._workflow_api import WorkflowAPI
+                self._api_cache[name] = WorkflowAPI(self)
+            elif name == "users":
+                from ._user_api import UserAPI
+                self._api_cache[name] = UserAPI(self)
+            elif name == "workflow_skills":
+                from ._workflow_skill_api import WorkflowSkillAPI
+                self._api_cache[name] = WorkflowSkillAPI(self)
+            elif name == "workflow_tasks":
+                from ._workflow_task_api import WorkflowTaskAPI
+                self._api_cache[name] = WorkflowTaskAPI(self)
+        return self._api_cache[name]
 
     @classmethod
-    def from_env(cls, **kwargs) -> "AmbientClient":
-        """
-        Create client from environment variables.
-
-        Environment variables:
-            AMBIENT_API_URL: API base URL (default: http://localhost:8080)
-            AMBIENT_TOKEN: Bearer token (required)
-            AMBIENT_PROJECT: Project name (required)
-
-        Args:
-            **kwargs: Additional arguments to override environment
-
-        Returns:
-            Configured AmbientClient
-
-        Raises:
-            ValueError: If required environment variables are missing
-        """
-        import os
-        
-        base_url = kwargs.get("base_url") or os.getenv(
+    def from_env(cls, **kwargs) -> "AmbientClient":  # type: ignore[no-untyped-def]
+        base_url = kwargs.pop("base_url", None) or os.getenv(
             "AMBIENT_API_URL", "http://localhost:8080"
         )
-        token = kwargs.get("token") or os.getenv("AMBIENT_TOKEN")
-        project = kwargs.get("project") or os.getenv("AMBIENT_PROJECT")
-        
+        token = kwargs.pop("token", None) or os.getenv("AMBIENT_TOKEN")
+        project = kwargs.pop("project", None) or os.getenv("AMBIENT_PROJECT")
+
         if not token:
             raise ValueError("AMBIENT_TOKEN environment variable is required")
         if not project:
             raise ValueError("AMBIENT_PROJECT environment variable is required")
-        
-        return cls(
-            base_url=base_url,
-            token=token,
-            project=project,
-            **{k: v for k, v in kwargs.items() if k not in ("base_url", "token", "project")}
-        )
+
+        return cls(base_url=base_url, token=token, project=project, **kwargs)
 
     def _validate_token(self, token: str) -> None:
-        """Validate token format and security."""
         if not token:
-            raise ValueError("Token cannot be empty")
-        
+            raise ValueError("token cannot be empty")
         if len(token) < 10:
-            raise ValueError("Token appears too short to be valid")
-        
-        # Check for common placeholder values
+            raise ValueError("token appears too short to be valid")
         if token.lower() in ("your_token_here", "your-token-here", "token", "bearer"):
-            raise ValueError("Token appears to be a placeholder value")
-        
-        # Check for potential token leakage patterns
-        if "AMBIENT_TOKEN=" in token:
-            raise ValueError("Token contains 'AMBIENT_TOKEN=' prefix - potential format error")
+            raise ValueError("token appears to be a placeholder value")
 
     def _validate_project(self, project: str) -> None:
-        """Validate project name format."""
         if not project:
-            raise ValueError("Project cannot be empty")
-        
+            raise ValueError("project cannot be empty")
         if not project.replace("-", "").replace("_", "").isalnum():
-            raise ValueError("Project must contain only alphanumeric characters, hyphens, and underscores")
-        
+            raise ValueError("project must contain only alphanumeric characters, hyphens, and underscores")
         if len(project) > 63:
-            raise ValueError("Project name cannot exceed 63 characters")
+            raise ValueError("project name cannot exceed 63 characters")
 
     def _validate_base_url(self, base_url: str) -> None:
-        """Validate base URL format."""
         if not base_url:
-            raise ValueError("Base URL cannot be empty")
-        
+            raise ValueError("base URL cannot be empty")
         parsed = urlparse(base_url)
         if not parsed.scheme or not parsed.netloc:
-            raise ValueError("Base URL must include scheme (http/https) and host")
-        
+            raise ValueError("base URL must include scheme and host")
         if parsed.scheme not in ("http", "https"):
-            raise ValueError("Base URL scheme must be http or https")
-        
-        # Check for common placeholder values
-        if "localhost" in parsed.netloc and not base_url.startswith("http://localhost"):
-            raise ValueError("Localhost URLs should use http://localhost format")
-        
+            raise ValueError("base URL scheme must be http or https")
         if "example.com" in parsed.netloc:
-            raise ValueError("Base URL appears to contain placeholder domain")
+            raise ValueError("base URL appears to contain placeholder domain")

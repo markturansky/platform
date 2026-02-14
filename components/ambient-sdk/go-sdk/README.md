@@ -381,12 +381,7 @@ go run main.go
 
 ## OpenAPI Specification
 
-This SDK is built to match the OpenAPI specification in `../openapi.yaml`. The specification defines:
-
-- **Endpoints**: `/v1/sessions` (create, list, get)
-- **Authentication**: Bearer token + X-Ambient-Project header
-- **Request/Response**: JSON types matching this SDK
-- **Error Handling**: Structured error responses with HTTP status codes
+This SDK is built to match the canonical OpenAPI specification owned by the API server at `../../ambient-api-server/openapi/openapi.yaml`. The SDK does not maintain its own spec copy — types and client behavior derive from the API server's definitions.
 
 ## Contributing
 

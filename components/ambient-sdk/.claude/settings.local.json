@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl:*)",
+      "Bash(mkdir:*)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=$GOROOT/bin:$PATH go build ./...)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=$GOROOT/bin:$PATH go run . )",
+      "Bash(-spec ../../../ambient-api-server/openapi/openapi.yaml )",
+      "Bash(-go-out ../go-sdk )",
+      "Bash(-python-out ../python-sdk)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=$GOROOT/bin:$PATH go run . )",
+      "Bash(-spec /home/mturansk/projects/src/github.com/ambient/platform/components/ambient-api-server/openapi/openapi.yaml )",
+      "Bash(-go-out /home/mturansk/projects/src/github.com/ambient/platform/components/ambient-sdk/go-sdk )",
+      "Bash(-python-out /home/mturansk/projects/src/github.com/ambient/platform/components/ambient-sdk/python-sdk)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=$GOROOT/bin:$PATH go run . )",
+      "Bash(-spec /home/mturansk/projects/src/github.com/ambient/platform/components/ambient-api-server/openapi/openapi.yaml )",
+      "Bash(-go-out /home/mturansk/projects/src/github.com/ambient/platform/components/ambient-sdk/go-sdk )",
+      "Bash(ls:*)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=$GOROOT/bin:$PATH go fmt ./...)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=$GOROOT/bin:$PATH go run . )",
+      "Bash(-spec /home/mturansk/projects/src/github.com/ambient/platform/components/ambient-api-server/openapi/openapi.yaml )",
+      "Bash(-go-out /home/mturansk/projects/src/github.com/ambient/platform/components/ambient-sdk/go-sdk )",
+      "Bash(python3:*)",
+      "Bash(/home/mturansk/go/go1.24.4.linux-amd64/go/bin/go vet ./...)",
+      "Bash(/home/mturansk/go/go1.24.4.linux-amd64/go/bin/go build ./...)",
+      "Bash(/home/mturansk/go/go1.24.4.linux-amd64/go/bin/go tool vet ./...)",
+      "Bash(true)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=/home/mturansk/go/go1.24.4.linux-amd64/go/bin:$PATH go build -o /tmp/ambient-sdk-generator .)",
+      "Bash(/tmp/ambient-sdk-generator:*)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=/home/mturansk/go/go1.24.4.linux-amd64/go/bin:$PATH go fmt ./...)",
+      "Bash(GOROOT=/home/mturansk/go/go1.24.4.linux-amd64/go PATH=/home/mturansk/go/go1.24.4.linux-amd64/go/bin:$PATH go build ./...)"
+    ],
+    "deny": []
+  }
+}

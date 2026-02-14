@@ -115,7 +115,7 @@ func main() {
 ```
 ambient-sdk/
 ├── README.md                 # This file
-├── openapi.yaml             # Canonical API specification
+├── docs/                    # Architecture and auth documentation
 ├── go-sdk/                  # Go client library
 │   ├── types/              # Generated Go types
 │   ├── client/             # K8s client utilities  
@@ -200,13 +200,9 @@ async for update in session.watch():
 3. **Type Safety**: Compile-time guarantees prevent regressions
 4. **Automated Testing**: SDK includes comprehensive test suites
 
-## OpenAPI Design Principles
+## OpenAPI Specification
 
-- **Resource-First**: Model after Kubernetes CRDs
-- **Versioning**: Support v1alpha1 → v1beta1 → v1 progression  
-- **Validation**: Rich JSON Schema constraints
-- **Documentation**: Complete field descriptions and examples
-- **Extensibility**: Support for custom fields and annotations
+The canonical API spec lives in the API server at `../ambient-api-server/openapi/openapi.yaml`. The SDK does not maintain its own copy — it derives types and client behavior from the API server's spec. When the API server adds or changes endpoints, the SDK wrappers are updated to match.
 
 ## Getting Started
 
