@@ -9,7 +9,6 @@
 **1. User Token Authentication Required**
 
 ```go
-// ALWAYS for user-initiated operations
 reqK8s, reqDyn := GetK8sClientsForRequest(c)
 if reqK8s == nil {
     c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or missing token"})
@@ -31,20 +30,17 @@ log.Printf("Request headers: %v", headers)
 
 ```go
 log.Printf("Token length: %d", len(token))
-// Redact in URL paths
 path = strings.Split(path, "?")[0] + "?token=[REDACTED]"
 ```
 
 **Token Redaction Pattern:** See `server/server.go:22-34`
 
 ```go
-// Custom log formatter that redacts tokens
 func customRedactingFormatter(param gin.LogFormatterParams) string {
     path := param.Path
     if strings.Contains(path, "token=") {
         path = strings.Split(path, "?")[0] + "?token=[REDACTED]"
     }
-    // ... rest of formatting
 }
 ```
 
@@ -95,13 +91,10 @@ SecurityContext: &corev1.SecurityContext{
 **1. Validate All User Input**
 
 ```go
-// Validate resource names (K8s DNS label requirements)
 if !isValidK8sName(name) {
     c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid name format"})
     return
 }
-
-// Validate URLs for repository inputs
 if _, err := url.Parse(repoURL); err != nil {
     c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid repository URL"})
     return
@@ -111,10 +104,20 @@ if _, err := url.Parse(repoURL); err != nil {
 **2. Sanitize for Log Injection**
 
 ```go
-// Prevent log injection with newlines
 name = strings.ReplaceAll(name, "\n", "")
 name = strings.ReplaceAll(name, "\r", "")
 ```
+
+## Exception: Public API Gateway
+
+The `components/public-api/` service is intentionally different from the backend:
+
+- **No K8s Clients**: Does NOT use `GetK8sClientsForRequest()` or access Kubernetes directly
+- **No RBAC Permissions**: ServiceAccount has NO RoleBindings
+- **Token Forwarding Only**: Proxies requests to backend with user's token
+- **Backend Validates**: All K8s operations and RBAC enforcement happen in the backend
+
+This separation minimizes the attack surface of the externally-exposed service.
 
 ## Common Security Patterns
 
@@ -128,7 +131,6 @@ if len(parts) != 2 || !strings.EqualFold(parts[0], "Bearer") {
     return
 }
 token := strings.TrimSpace(parts[1])
-// NEVER log token itself
 log.Printf("Processing request with token (len=%d)", len(token))
 ```
 
@@ -138,32 +140,14 @@ log.Printf("Processing request with token (len=%d)", len(token))
 func ValidateProjectContext() gin.HandlerFunc {
     return func(c *gin.Context) {
         projectName := c.Param("projectName")
-
-        // Get user-scoped K8s client
         reqK8s, _ := GetK8sClientsForRequest(c)
         if reqK8s == nil {
             c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
             c.Abort()
             return
         }
-
-        // Check if user can access namespace
-        ssar := &authv1.SelfSubjectAccessReview{
-            Spec: authv1.SelfSubjectAccessReviewSpec{
-                ResourceAttributes: &authv1.ResourceAttributes{
-                    Resource:  "namespaces",
-                    Verb:      "get",
-                    Name:      projectName,
-                },
-            },
-        }
-        res, err := reqK8s.AuthorizationV1().SelfSubjectAccessReviews().Create(ctx, ssar, v1.CreateOptions{})
-        if err != nil || !res.Status.Allowed {
-            c.JSON(http.StatusForbidden, gin.H{"error": "Access denied to project"})
-            c.Abort()
-            return
-        }
-
+        // Check if user can access namespace via SelfSubjectAccessReview
+        // ...
         c.Set("project", projectName)
         c.Next()
     }
@@ -173,38 +157,18 @@ func ValidateProjectContext() gin.HandlerFunc {
 ### Pattern 3: Minting Service Account Tokens
 
 ```go
-// Only backend service account can create tokens for runner pods
 tokenRequest := &authv1.TokenRequest{
     Spec: authv1.TokenRequestSpec{
         ExpirationSeconds: int64Ptr(3600),
     },
 }
-
 tokenResponse, err := K8sClient.CoreV1().ServiceAccounts(namespace).CreateToken(
-    ctx,
-    serviceAccountName,
-    tokenRequest,
-    v1.CreateOptions{},
+    ctx, serviceAccountName, tokenRequest, v1.CreateOptions{},
 )
-if err != nil {
-    return fmt.Errorf("failed to create token: %w", err)
-}
-
 // Store token in secret (never log it)
-secret := &corev1.Secret{
-    ObjectMeta: v1.ObjectMeta{
-        Name:      fmt.Sprintf("%s-token", sessionName),
-        Namespace: namespace,
-    },
-    StringData: map[string]string{
-        "token": tokenResponse.Status.Token,
-    },
-}
 ```
 
 ## Security Checklist
-
-Before committing code that handles:
 
 **Authentication:**
 
@@ -239,14 +203,9 @@ Before committing code that handles:
 - [ ] Capabilities dropped (ALL)
 - [ ] OwnerReferences set for cleanup
 
-## Recent Security Issues
+## Production Security
 
-- **2024-11-15:** Fixed token leak in logs - added custom redacting formatter
-- **2024-10-20:** Added RBAC validation middleware - prevent unauthorized access
-- **2024-10-10:** Fixed privilege escalation risk - added SecurityContext to Job pods
-
-## Security Review Resources
-
-- OWASP Top 10: <https://owasp.org/www-project-top-ten/>
-- Kubernetes Security Best Practices: <https://kubernetes.io/docs/concepts/security/>
-- RBAC Documentation: <https://kubernetes.io/docs/reference/access-authn-authz/rbac/>
+- **API keys**: Store in Kubernetes Secrets, managed via ProjectSettings CR
+- **RBAC**: Namespace-scoped isolation prevents cross-project access
+- **OAuth integration**: OpenShift OAuth for cluster-based authentication (see `docs/deployment/OPENSHIFT_OAUTH.md`)
+- **Network policies**: Component isolation and secure communication
