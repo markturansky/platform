@@ -50,6 +50,7 @@ func (a *{{.Resource.Name}}API) List(ctx context.Context, opts *types.ListOption
 	return &result, nil
 }
 
+{{- if .Resource.HasPatch}}
 func (a *{{.Resource.Name}}API) Update(ctx context.Context, id string, patch map[string]any) (*types.{{.Resource.Name}}, error) {
 	body, err := json.Marshal(patch)
 	if err != nil {
@@ -61,9 +62,32 @@ func (a *{{.Resource.Name}}API) Update(ctx context.Context, id string, patch map
 	}
 	return &result, nil
 }
-{{if .Resource.HasDelete}}
+{{end}}
+{{- if .Resource.HasDelete}}
 func (a *{{.Resource.Name}}API) Delete(ctx context.Context, id string) error {
 	return a.client.do(ctx, http.MethodDelete, "/{{.Resource.PathSegment}}/"+id, nil, http.StatusNoContent, nil)
+}
+{{end}}
+{{- if .Resource.HasStatusPatch}}
+func (a *{{.Resource.Name}}API) UpdateStatus(ctx context.Context, id string, patch map[string]any) (*types.{{.Resource.Name}}, error) {
+	body, err := json.Marshal(patch)
+	if err != nil {
+		return nil, fmt.Errorf("marshal status patch: %w", err)
+	}
+	var result types.{{.Resource.Name}}
+	if err := a.client.do(ctx, http.MethodPatch, "/{{.Resource.PathSegment}}/"+id+"/status", body, http.StatusOK, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
+}
+{{end}}
+{{- range .Resource.Actions}}
+func (a *{{$.Resource.Name}}API) {{. | title}}(ctx context.Context, id string) (*types.{{$.Resource.Name}}, error) {
+	var result types.{{$.Resource.Name}}
+	if err := a.client.do(ctx, http.MethodPost, "/{{$.Resource.PathSegment}}/"+id+"/{{.}}", nil, http.StatusOK, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 {{end}}
 func (a *{{.Resource.Name}}API) ListAll(ctx context.Context, opts *types.ListOptions) *Iterator[types.{{.Resource.Name}}] {

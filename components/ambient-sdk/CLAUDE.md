@@ -19,7 +19,17 @@ This SDK is one piece of a multi-component system coordinated via `../working.md
 
 Cross-session coordination with `ambient-api-server` and `ambient-control-plane` happens through `../working.md`. Read it before making contract-breaking changes.
 
-**ALWAYS** report changes, suggestions, and next steps in `../working.md` because we are in active development mode. I *will* remove this directive when we're done, but we're not done yet. **ALWAYS** report status to working.md 
+**ALWAYS** report changes, suggestions, and next steps in `../working.md` because we are in active development mode. I *will* remove this directive when we're done, but we're not done yet. **ALWAYS** report status to working.md via the coordinator server.
+
+### Coordinator Server Protocol
+
+The coordinator server at `http://localhost:4345` manages `../working.md`. Each agent owns a section between `<!-- BEGIN:SDK -->` and `<!-- END:SDK -->` markers.
+
+- **Post your update:** Write content to a temp file, then `curl -s -X POST http://localhost:4345/agent/sdk -H 'Content-Type: text/plain' --data-binary @/tmp/sdk_update.md`
+- **Read your section only:** `curl -s http://localhost:4345/agent/sdk`
+- **Read full document:** `curl -s http://localhost:4345/raw`
+- **Do NOT use** `POST /update` with JSON — that endpoint does not exist. Use `/agent/sdk` with `text/plain`.
+- Always write to a temp file first and use `--data-binary @file` to avoid shell mangling of markdown.
 
 ## Quick Reference
 
@@ -113,6 +123,10 @@ The API server owns the canonical OpenAPI spec at `../ambient-api-server/openapi
 - Bearer tokens, SHA256 tokens, and JWTs are pattern-matched and redacted in logs
 - API error responses are sanitized before returning to callers
 - URL validation rejects placeholder domains (`example.com`) and dangerous schemes
+
+## Smoke Test
+
+Run `cd go-sdk && go run examples/main.go` until it passes. This is the SDK's end-to-end smoke test against the live API server. It currently returns 404 because the API server has not been migrated to serve `/api/ambient-api-server/v1/sessions` yet. Once the full migration (api-server + control-plane + deployment) is complete, this test will pass. Keep running it — when it stops returning 404, the platform is wired up.
 
 ## Loadable Context
 

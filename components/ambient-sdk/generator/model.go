@@ -7,24 +7,31 @@ import (
 )
 
 type Resource struct {
-	Name           string
-	Plural         string
-	PathSegment    string
-	Fields         []Field
-	RequiredFields []string
-	PatchFields    []Field
-	HasDelete      bool
+	Name              string
+	Plural            string
+	PathSegment       string
+	Fields            []Field
+	RequiredFields    []string
+	PatchFields       []Field
+	StatusPatchFields []Field
+	HasDelete         bool
+	HasPatch          bool
+	HasStatusPatch    bool
+	Actions           []string
 }
 
 type Field struct {
 	Name       string
 	GoName     string
 	PythonName string
+	TSName     string
 	Type       string
 	Format     string
 	GoType     string
 	PythonType string
+	TSType     string
 	Required   bool
+	ReadOnly   bool
 	JSONTag    string
 }
 
@@ -70,6 +77,11 @@ func toGoType(openAPIType, format string) string {
 			return "int32"
 		}
 		return "int"
+	case "number":
+		if format == "double" || format == "float" {
+			return "float64"
+		}
+		return "float64"
 	case "boolean":
 		return "bool"
 	default:
@@ -86,6 +98,8 @@ func toPythonType(openAPIType, format string) string {
 		return "str"
 	case "integer":
 		return "int"
+	case "number":
+		return "float"
 	case "boolean":
 		return "bool"
 	default:
@@ -102,6 +116,8 @@ func pythonDefault(openAPIType, format string) string {
 		return "\"\""
 	case "integer":
 		return "0"
+	case "number":
+		return "0.0"
 	case "boolean":
 		return "False"
 	default:
@@ -114,6 +130,66 @@ func jsonTag(name string, required bool) string {
 		return fmt.Sprintf("`json:\"%s\"`", name)
 	}
 	return fmt.Sprintf("`json:\"%s,omitempty\"`", name)
+}
+
+func toTSType(openAPIType, format string) string {
+	switch openAPIType {
+	case "string":
+		if format == "date-time" {
+			return "string"
+		}
+		return "string"
+	case "integer":
+		return "number"
+	case "number":
+		return "number"
+	case "boolean":
+		return "boolean"
+	default:
+		return "string"
+	}
+}
+
+func tsDefault(openAPIType, format string) string {
+	switch openAPIType {
+	case "string":
+		return "''"
+	case "integer":
+		return "0"
+	case "number":
+		return "0"
+	case "boolean":
+		return "false"
+	default:
+		return "''"
+	}
+}
+
+func toCamelCase(snakeName string) string {
+	parts := strings.Split(snakeName, "_")
+	if len(parts) == 0 {
+		return snakeName
+	}
+	var result strings.Builder
+	result.WriteString(parts[0])
+	for _, part := range parts[1:] {
+		if part == "" {
+			continue
+		}
+		runes := []rune(part)
+		runes[0] = unicode.ToUpper(runes[0])
+		result.WriteString(string(runes))
+	}
+	return result.String()
+}
+
+func lowerFirst(s string) string {
+	if s == "" {
+		return s
+	}
+	runes := []rune(s)
+	runes[0] = unicode.ToLower(runes[0])
+	return string(runes)
 }
 
 func toSnakeCase(camelCase string) string {

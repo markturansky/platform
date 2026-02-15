@@ -36,6 +36,10 @@ class {{.Resource.Name}}:
             {{.PythonName}}=_parse_datetime(data.get("{{.Name}}")),
 {{- else if eq .PythonType "int"}}
             {{.PythonName}}=data.get("{{.Name}}", 0),
+{{- else if eq .PythonType "float"}}
+            {{.PythonName}}=data.get("{{.Name}}", 0.0),
+{{- else if eq .PythonType "bool"}}
+            {{.PythonName}}=data.get("{{.Name}}", False),
 {{- else}}
             {{.PythonName}}=data.get("{{.Name}}", ""),
 {{- end}}
@@ -70,11 +74,11 @@ class {{.Resource.Name}}Builder:
     def __init__(self) -> None:
         self._data: dict[str, Any] = {}
 
-{{range .Resource.Fields}}
+{{range .Resource.Fields}}{{if isWritable .}}
     def {{.PythonName}}(self, value: {{.PythonType}}) -> {{$.Resource.Name}}Builder:
         self._data["{{.Name}}"] = value
         return self
-{{end}}
+{{end}}{{end}}
     def build(self) -> dict:
 {{- range .Resource.Fields}}
 {{- if .Required}}
@@ -98,3 +102,17 @@ class {{.Resource.Name}}Patch:
 {{end}}
     def to_dict(self) -> dict:
         return dict(self._data)
+{{if .Resource.HasStatusPatch}}
+
+class {{.Resource.Name}}StatusPatch:
+    def __init__(self) -> None:
+        self._data: dict[str, Any] = {}
+
+{{range .Resource.StatusPatchFields}}
+    def {{.PythonName}}(self, value: {{.PythonType}}) -> {{$.Resource.Name}}StatusPatch:
+        self._data["{{.Name}}"] = value
+        return self
+{{end}}
+    def to_dict(self) -> dict:
+        return dict(self._data)
+{{end}}

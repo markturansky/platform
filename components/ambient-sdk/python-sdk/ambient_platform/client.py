@@ -111,6 +111,26 @@ class AmbientClient:
     def workflow_tasks(self):  # type: ignore[no-untyped-def]
         return self._get_api("workflow_tasks")
 
+    @property
+    def projects(self):  # type: ignore[no-untyped-def]
+        return self._get_api("projects")
+
+    @property
+    def project_settings(self):  # type: ignore[no-untyped-def]
+        return self._get_api("project_settings")
+
+    @property
+    def permissions(self):  # type: ignore[no-untyped-def]
+        return self._get_api("permissions")
+
+    @property
+    def repository_refs(self):  # type: ignore[no-untyped-def]
+        return self._get_api("repository_refs")
+
+    @property
+    def project_keys(self):  # type: ignore[no-untyped-def]
+        return self._get_api("project_keys")
+
     def _get_api(self, name: str):  # type: ignore[no-untyped-def]
         if name not in self._api_cache:
             if name == "sessions":
@@ -137,6 +157,21 @@ class AmbientClient:
             elif name == "workflow_tasks":
                 from ._workflow_task_api import WorkflowTaskAPI
                 self._api_cache[name] = WorkflowTaskAPI(self)
+            elif name == "projects":
+                from ._project_api import ProjectAPI
+                self._api_cache[name] = ProjectAPI(self)
+            elif name == "project_settings":
+                from ._project_settings_api import ProjectSettingsAPI
+                self._api_cache[name] = ProjectSettingsAPI(self)
+            elif name == "permissions":
+                from ._permission_api import PermissionAPI
+                self._api_cache[name] = PermissionAPI(self)
+            elif name == "repository_refs":
+                from ._repository_ref_api import RepositoryRefAPI
+                self._api_cache[name] = RepositoryRefAPI(self)
+            elif name == "project_keys":
+                from ._project_key_api import ProjectKeyAPI
+                self._api_cache[name] = ProjectKeyAPI(self)
         return self._api_cache[name]
 
     @classmethod

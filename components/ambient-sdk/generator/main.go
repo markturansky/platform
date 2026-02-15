@@ -17,13 +17,14 @@ func main() {
 	specPath := flag.String("spec", "", "path to openapi.yaml")
 	goOut := flag.String("go-out", "", "output directory for Go SDK")
 	pythonOut := flag.String("python-out", "", "output directory for Python SDK")
+	tsOut := flag.String("ts-out", "", "output directory for TypeScript SDK")
 	flag.Parse()
 
 	if *specPath == "" {
 		log.Fatal("--spec is required")
 	}
-	if *goOut == "" && *pythonOut == "" {
-		log.Fatal("at least one of --go-out or --python-out is required")
+	if *goOut == "" && *pythonOut == "" && *tsOut == "" {
+		log.Fatal("at least one of --go-out, --python-out, or --ts-out is required")
 	}
 
 	spec, err := parseSpec(*specPath)
@@ -60,6 +61,13 @@ func main() {
 		}
 		fmt.Printf("Python SDK generated in %s\n", *pythonOut)
 	}
+
+	if *tsOut != "" {
+		if err := generateTypeScript(spec, *tsOut, header); err != nil {
+			log.Fatalf("generate TypeScript: %v", err)
+		}
+		fmt.Printf("TypeScript SDK generated in %s\n", *tsOut)
+	}
 }
 
 type GeneratedHeader struct {
@@ -75,6 +83,12 @@ type goTemplateData struct {
 }
 
 type pythonTemplateData struct {
+	Header   GeneratedHeader
+	Resource Resource
+	Spec     *Spec
+}
+
+type tsTemplateData struct {
 	Header   GeneratedHeader
 	Resource Resource
 	Spec     *Spec
@@ -143,6 +157,65 @@ func generateGo(spec *Spec, outDir string, header GeneratedHeader) error {
 	return nil
 }
 
+func generateTypeScript(spec *Spec, outDir string, header GeneratedHeader) error {
+	srcDir := filepath.Join(outDir, "src")
+	if err := os.MkdirAll(srcDir, 0755); err != nil {
+		return err
+	}
+
+	tmplDir := filepath.Join(getTemplateDir(), "ts")
+
+	baseTmpl, err := loadTemplate(filepath.Join(tmplDir, "base.ts.tmpl"))
+	if err != nil {
+		return fmt.Errorf("load base template: %w", err)
+	}
+	if err := executeTemplate(baseTmpl, filepath.Join(srcDir, "base.ts"), tsTemplateData{Header: header, Spec: spec}); err != nil {
+		return fmt.Errorf("execute base template: %w", err)
+	}
+
+	typesTmpl, err := loadTemplate(filepath.Join(tmplDir, "types.ts.tmpl"))
+	if err != nil {
+		return fmt.Errorf("load types template: %w", err)
+	}
+
+	clientTmpl, err := loadTemplate(filepath.Join(tmplDir, "client.ts.tmpl"))
+	if err != nil {
+		return fmt.Errorf("load client template: %w", err)
+	}
+
+	for _, r := range spec.Resources {
+		data := tsTemplateData{Header: header, Resource: r, Spec: spec}
+		fileName := toSnakeCase(r.Name) + ".ts"
+
+		if err := executeTemplate(typesTmpl, filepath.Join(srcDir, fileName), data); err != nil {
+			return fmt.Errorf("execute types template for %s: %w", r.Name, err)
+		}
+
+		apiFileName := toSnakeCase(r.Name) + "_api.ts"
+		if err := executeTemplate(clientTmpl, filepath.Join(srcDir, apiFileName), data); err != nil {
+			return fmt.Errorf("execute client template for %s: %w", r.Name, err)
+		}
+	}
+
+	ambientClientTmpl, err := loadTemplate(filepath.Join(tmplDir, "ambient_client.ts.tmpl"))
+	if err != nil {
+		return fmt.Errorf("load ambient_client template: %w", err)
+	}
+	if err := executeTemplate(ambientClientTmpl, filepath.Join(srcDir, "client.ts"), tsTemplateData{Header: header, Spec: spec}); err != nil {
+		return fmt.Errorf("execute ambient_client template: %w", err)
+	}
+
+	indexTmpl, err := loadTemplate(filepath.Join(tmplDir, "index.ts.tmpl"))
+	if err != nil {
+		return fmt.Errorf("load index template: %w", err)
+	}
+	if err := executeTemplate(indexTmpl, filepath.Join(srcDir, "index.ts"), tsTemplateData{Header: header, Spec: spec}); err != nil {
+		return fmt.Errorf("execute index template: %w", err)
+	}
+
+	return nil
+}
+
 func generatePython(spec *Spec, outDir string, header GeneratedHeader) error {
 	pkgDir := outDir
 	if err := os.MkdirAll(pkgDir, 0755); err != nil {
@@ -202,6 +275,10 @@ func loadTemplate(path string) (*template.Template, error) {
 		"goName":        toGoName,
 		"pythonDefault": func(f Field) string { return pythonDefault(f.Type, f.Format) },
 		"isDateTime":    isDateTimeField,
+		"isWritable":    func(f Field) bool { return !f.ReadOnly },
+		"camelCase":     toCamelCase,
+		"lowerFirst":    lowerFirst,
+		"tsDefault":     func(f Field) string { return tsDefault(f.Type, f.Format) },
 		"hasTimeImport": func(fields []Field) bool {
 			for _, f := range fields {
 				if f.Format == "date-time" {
@@ -249,6 +326,11 @@ func computeSpecHash(specPath string) (string, error) {
 		filepath.Join(specDir, "openapi.users.yaml"),
 		filepath.Join(specDir, "openapi.workflowSkills.yaml"),
 		filepath.Join(specDir, "openapi.workflowTasks.yaml"),
+		filepath.Join(specDir, "openapi.projects.yaml"),
+		filepath.Join(specDir, "openapi.projectSettings.yaml"),
+		filepath.Join(specDir, "openapi.permissions.yaml"),
+		filepath.Join(specDir, "openapi.repositoryRefs.yaml"),
+		filepath.Join(specDir, "openapi.projectKeys.yaml"),
 	}
 
 	for _, f := range files {

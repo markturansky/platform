@@ -44,8 +44,13 @@ func parseSpec(specPath string) (*Spec, error) {
 		"Skill":         "openapi.skills.yaml",
 		"Workflow":      "openapi.workflows.yaml",
 		"User":          "openapi.users.yaml",
-		"WorkflowSkill": "openapi.workflowSkills.yaml",
-		"WorkflowTask":  "openapi.workflowTasks.yaml",
+		"WorkflowSkill":    "openapi.workflowSkills.yaml",
+		"WorkflowTask":     "openapi.workflowTasks.yaml",
+		"Project":          "openapi.projects.yaml",
+		"ProjectSettings":  "openapi.projectSettings.yaml",
+		"Permission":       "openapi.permissions.yaml",
+		"RepositoryRef":    "openapi.repositoryRefs.yaml",
+		"ProjectKey":       "openapi.projectKeys.yaml",
 	}
 
 	pathSegments := map[string]string{
@@ -55,8 +60,13 @@ func parseSpec(specPath string) (*Spec, error) {
 		"Skill":         "skills",
 		"Workflow":      "workflows",
 		"User":          "users",
-		"WorkflowSkill": "workflow_skills",
-		"WorkflowTask":  "workflow_tasks",
+		"WorkflowSkill":    "workflow_skills",
+		"WorkflowTask":     "workflow_tasks",
+		"Project":          "projects",
+		"ProjectSettings":  "project_settings",
+		"Permission":       "permissions",
+		"RepositoryRef":    "repository_refs",
+		"ProjectKey":       "project_keys",
 	}
 
 	var resources []Resource
@@ -116,16 +126,37 @@ func extractResource(name, pathSegment string, doc *subSpecDoc) (*Resource, erro
 		}
 	}
 
+	statusPatchName := name + "StatusPatchRequest"
+	statusPatchSchema, ok := doc.Components.Schemas[statusPatchName]
+	var statusPatchFields []Field
+	hasStatusPatch := false
+	if ok {
+		statusPatchMap, ok := statusPatchSchema.(map[string]interface{})
+		if ok {
+			statusPatchFields, _, err = extractPatchFields(statusPatchMap)
+			if err != nil {
+				return nil, fmt.Errorf("extract status patch fields for %s: %w", name, err)
+			}
+			hasStatusPatch = len(statusPatchFields) > 0
+		}
+	}
+
 	hasDelete := checkHasDelete(doc.Paths, pathSegment)
+	hasPatch := checkHasPatch(doc.Paths, pathSegment)
+	actions := detectActions(doc.Paths, pathSegment)
 
 	return &Resource{
-		Name:           name,
-		Plural:         resourcePlural(name),
-		PathSegment:    pathSegment,
-		Fields:         fields,
-		RequiredFields: requiredFields,
-		PatchFields:    patchFields,
-		HasDelete:      hasDelete,
+		Name:              name,
+		Plural:            resourcePlural(name),
+		PathSegment:       pathSegment,
+		Fields:            fields,
+		RequiredFields:    requiredFields,
+		PatchFields:       patchFields,
+		StatusPatchFields: statusPatchFields,
+		HasDelete:         hasDelete,
+		HasPatch:          hasPatch,
+		HasStatusPatch:    hasStatusPatch,
+		Actions:           actions,
 	}, nil
 }
 
@@ -147,6 +178,16 @@ func resourcePlural(name string) string {
 		return "WorkflowSkills"
 	case "WorkflowTask":
 		return "WorkflowTasks"
+	case "Project":
+		return "Projects"
+	case "ProjectSettings":
+		return "ProjectSettings"
+	case "Permission":
+		return "Permissions"
+	case "RepositoryRef":
+		return "RepositoryRefs"
+	case "ProjectKey":
+		return "ProjectKeys"
 	default:
 		return name + "s"
 	}
@@ -208,6 +249,7 @@ func extractFields(schemaMap map[string]interface{}) ([]Field, []string, error) 
 
 			propType, _ := propMap["type"].(string)
 			propFormat, _ := propMap["format"].(string)
+			readOnly, _ := propMap["readOnly"].(bool)
 
 			isRequired := false
 			for _, r := range requiredFields {
@@ -221,11 +263,14 @@ func extractFields(schemaMap map[string]interface{}) ([]Field, []string, error) 
 				Name:       propName,
 				GoName:     toGoName(propName),
 				PythonName: propName,
+				TSName:     toCamelCase(propName),
 				Type:       propType,
 				Format:     propFormat,
 				GoType:     toGoType(propType, propFormat),
 				PythonType: toPythonType(propType, propFormat),
+				TSType:     toTSType(propType, propFormat),
 				Required:   isRequired,
+				ReadOnly:   readOnly,
 				JSONTag:    jsonTag(propName, isRequired),
 			}
 
@@ -265,10 +310,12 @@ func extractPatchFields(schemaMap map[string]interface{}) ([]Field, []string, er
 			Name:       propName,
 			GoName:     toGoName(propName),
 			PythonName: propName,
+			TSName:     toCamelCase(propName),
 			Type:       propType,
 			Format:     propFormat,
 			GoType:     toGoType(propType, propFormat),
 			PythonType: toPythonType(propType, propFormat),
+			TSType:     toTSType(propType, propFormat),
 			Required:   false,
 			JSONTag:    jsonTag(propName, false),
 		}
@@ -281,6 +328,22 @@ func extractPatchFields(schemaMap map[string]interface{}) ([]Field, []string, er
 	})
 
 	return fields, nil, nil
+}
+
+func checkHasPatch(paths map[string]interface{}, pathSegment string) bool {
+	idPath := fmt.Sprintf("/api/ambient-api-server/v1/%s/{id}", pathSegment)
+	pathVal, ok := paths[idPath]
+	if !ok {
+		return false
+	}
+
+	pathMap, ok := pathVal.(map[string]interface{})
+	if !ok {
+		return false
+	}
+
+	_, hasPatch := pathMap["patch"]
+	return hasPatch
 }
 
 func checkHasDelete(paths map[string]interface{}, pathSegment string) bool {
@@ -297,6 +360,26 @@ func checkHasDelete(paths map[string]interface{}, pathSegment string) bool {
 
 	_, hasDelete := pathMap["delete"]
 	return hasDelete
+}
+
+func detectActions(paths map[string]interface{}, pathSegment string) []string {
+	knownActions := []string{"start", "stop"}
+	var found []string
+	for _, action := range knownActions {
+		actionPath := fmt.Sprintf("/api/ambient-api-server/v1/%s/{id}/%s", pathSegment, action)
+		pathVal, ok := paths[actionPath]
+		if !ok {
+			continue
+		}
+		pathMap, ok := pathVal.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if _, hasPost := pathMap["post"]; hasPost {
+			found = append(found, action)
+		}
+	}
+	return found
 }
 
 var objectReferenceFields = map[string]bool{

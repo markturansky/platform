@@ -39,12 +39,12 @@ func New{{.Resource.Name}}Builder() *{{.Resource.Name}}Builder {
 	return &{{.Resource.Name}}Builder{}
 }
 
-{{range .Resource.Fields}}
+{{range .Resource.Fields}}{{if isWritable .}}
 func (b *{{$.Resource.Name}}Builder) {{.GoName}}(v {{.GoType}}) *{{$.Resource.Name}}Builder {
 	b.resource.{{.GoName}} = v
 	return b
 }
-{{end}}
+{{end}}{{end}}
 
 func (b *{{.Resource.Name}}Builder) Build() (*{{.Resource.Name}}, error) {
 {{- range .Resource.Fields}}
@@ -82,3 +82,23 @@ func (b *{{$.Resource.Name}}PatchBuilder) {{.GoName}}(v {{.GoType}}) *{{$.Resour
 func (b *{{.Resource.Name}}PatchBuilder) Build() map[string]any {
 	return b.patch
 }
+{{if .Resource.HasStatusPatch}}
+type {{.Resource.Name}}StatusPatchBuilder struct {
+	patch map[string]any
+}
+
+func New{{.Resource.Name}}StatusPatchBuilder() *{{.Resource.Name}}StatusPatchBuilder {
+	return &{{.Resource.Name}}StatusPatchBuilder{patch: make(map[string]any)}
+}
+
+{{range .Resource.StatusPatchFields}}
+func (b *{{$.Resource.Name}}StatusPatchBuilder) {{.GoName}}(v {{.GoType}}) *{{$.Resource.Name}}StatusPatchBuilder {
+	b.patch["{{.Name}}"] = v
+	return b
+}
+{{end}}
+
+func (b *{{.Resource.Name}}StatusPatchBuilder) Build() map[string]any {
+	return b.patch
+}
+{{end}}
