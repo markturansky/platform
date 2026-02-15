@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(curl:*)",
+      "Bash(npm run lint)",
+      "Bash(npm run build:*)",
+      "Bash(node:*)",
+      "Bash(ls:*)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(rg:*)",
+      "Bash(npm test:*)",
+      "Bash(oc exec:*)",
+      "Bash(oc describe:*)",
+      "Bash(make:*)",
+      "Bash(oc get pods:*)"
+    ],
+    "deny": []
+  }
+}
