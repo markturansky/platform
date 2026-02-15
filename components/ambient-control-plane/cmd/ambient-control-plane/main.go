@@ -13,6 +13,8 @@ import (
 	"github.com/ambient/platform/components/ambient-control-plane/internal/config"
 	"github.com/ambient/platform/components/ambient-control-plane/internal/informer"
 	"github.com/ambient/platform/components/ambient-control-plane/internal/kubeclient"
+	"github.com/ambient/platform/components/ambient-control-plane/internal/process"
+	"github.com/ambient/platform/components/ambient-control-plane/internal/proxy"
 	"github.com/ambient/platform/components/ambient-control-plane/internal/reconciler"
 	"github.com/rs/zerolog"
 )
@@ -36,34 +38,85 @@ func run() error {
 	}
 
 	logger := setupLogger(cfg.LogLevel)
+
+	mode := os.Getenv("MODE")
+	if mode == "" {
+		mode = "kube"
+	}
+
 	logger.Info().
 		Str("version", version).
 		Str("build_time", buildTime).
 		Str("api_server", cfg.APIServerURL).
-		Str("namespace", cfg.Namespace).
+		Str("mode", mode).
 		Dur("poll_interval", cfg.PollInterval).
 		Int("workers", cfg.WorkerCount).
 		Msg("starting ambient-control-plane")
 
 	apiClient := buildAPIClient(cfg)
 
-	kube, err := kubeclient.New(cfg.Kubeconfig, cfg.Namespace, logger)
-	if err != nil {
-		return fmt.Errorf("initializing kubernetes client: %w", err)
-	}
-
 	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer cancel()
 
 	inf := informer.New(apiClient, cfg.PollInterval, logger)
 
-	sessionReconciler := reconciler.NewSessionReconciler(apiClient, kube, logger)
-	workflowReconciler := reconciler.NewWorkflowReconciler(apiClient, kube, logger)
-	taskReconciler := reconciler.NewTaskReconciler(apiClient, kube, logger)
+	if mode == "local" {
+		localCfg := config.LoadLocalConfig()
 
-	registerReconciler(inf, sessionReconciler)
-	registerReconciler(inf, workflowReconciler)
-	registerReconciler(inf, taskReconciler)
+		procManager := process.NewManager(process.ManagerConfig{
+			WorkspaceRoot: localCfg.WorkspaceRoot,
+			RunnerCommand: localCfg.RunnerCommand,
+			PortStart:     localCfg.PortRangeStart,
+			PortEnd:       localCfg.PortRangeEnd,
+			MaxSessions:   localCfg.MaxSessions,
+			BossURL:       localCfg.BossURL,
+			BossSpace:     localCfg.BossSpace,
+		}, logger)
+
+		aguiProxy := proxy.NewAGUIProxy(localCfg.ProxyAddr, procManager, logger)
+		localReconciler := reconciler.NewLocalSessionReconciler(apiClient, procManager, logger)
+
+		registerReconciler(inf, localReconciler)
+
+		go aguiProxy.Start(ctx)
+		go localReconciler.ReapLoop(ctx)
+
+		logger.Info().
+			Str("mode", "local").
+			Str("proxy_addr", localCfg.ProxyAddr).
+			Str("workspace_root", localCfg.WorkspaceRoot).
+			Int("port_range_start", localCfg.PortRangeStart).
+			Int("port_range_end", localCfg.PortRangeEnd).
+			Int("max_sessions", localCfg.MaxSessions).
+			Msg("running in local mode (no Kubernetes)")
+
+		go func() {
+			<-ctx.Done()
+			procManager.Shutdown(context.Background())
+		}()
+	} else {
+		kube, err := kubeclient.New(cfg.Kubeconfig, cfg.Namespace, logger)
+		if err != nil {
+			return fmt.Errorf("initializing kubernetes client: %w", err)
+		}
+
+		sessionReconciler := reconciler.NewSessionReconciler(apiClient, kube, logger)
+		workflowReconciler := reconciler.NewWorkflowReconciler(apiClient, kube, logger)
+		taskReconciler := reconciler.NewTaskReconciler(apiClient, kube, logger)
+		projectReconciler := reconciler.NewProjectReconciler(apiClient, kube, logger)
+		projectSettingsReconciler := reconciler.NewProjectSettingsReconciler(apiClient, kube, logger)
+
+		registerReconciler(inf, sessionReconciler)
+		registerReconciler(inf, workflowReconciler)
+		registerReconciler(inf, taskReconciler)
+		registerReconciler(inf, projectReconciler)
+		registerReconciler(inf, projectSettingsReconciler)
+
+		logger.Info().
+			Str("mode", "kube").
+			Str("namespace", cfg.Namespace).
+			Msg("running in Kubernetes mode")
+	}
 
 	logger.Info().Msg("all reconcilers registered, entering run loop")
 

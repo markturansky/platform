@@ -20,6 +20,18 @@ var AgenticSessionGVR = schema.GroupVersionResource{
 	Resource: "agenticsessions",
 }
 
+var NamespaceGVR = schema.GroupVersionResource{
+	Group:    "",
+	Version:  "v1",
+	Resource: "namespaces",
+}
+
+var RoleBindingGVR = schema.GroupVersionResource{
+	Group:    "rbac.authorization.k8s.io",
+	Version:  "v1",
+	Resource: "rolebindings",
+}
+
 type KubeClient struct {
 	dynamic   dynamic.Interface
 	namespace string
@@ -71,6 +83,14 @@ func buildRestConfig(kubeconfig string) (*rest.Config, error) {
 	return rest.InClusterConfig()
 }
 
+func NewFromDynamic(dynClient dynamic.Interface, namespace string, logger zerolog.Logger) *KubeClient {
+	return &KubeClient{
+		dynamic:   dynClient,
+		namespace: namespace,
+		logger:    logger.With().Str("component", "kubeclient").Logger(),
+	}
+}
+
 func (kc *KubeClient) GetAgenticSession(ctx context.Context, name string) (*unstructured.Unstructured, error) {
 	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(kc.namespace).Get(ctx, name, metav1.GetOptions{})
 }
@@ -79,6 +99,54 @@ func (kc *KubeClient) ListAgenticSessions(ctx context.Context) (*unstructured.Un
 	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(kc.namespace).List(ctx, metav1.ListOptions{})
 }
 
+func (kc *KubeClient) CreateAgenticSession(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(kc.namespace).Create(ctx, obj, metav1.CreateOptions{})
+}
+
+func (kc *KubeClient) UpdateAgenticSession(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(kc.namespace).Update(ctx, obj, metav1.UpdateOptions{})
+}
+
+func (kc *KubeClient) DeleteAgenticSession(ctx context.Context, name string) error {
+	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(kc.namespace).Delete(ctx, name, metav1.DeleteOptions{})
+}
+
 func (kc *KubeClient) Namespace() string {
 	return kc.namespace
+}
+
+func (kc *KubeClient) GetNamespace(ctx context.Context, name string) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(NamespaceGVR).Get(ctx, name, metav1.GetOptions{})
+}
+
+func (kc *KubeClient) CreateNamespace(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(NamespaceGVR).Create(ctx, obj, metav1.CreateOptions{})
+}
+
+func (kc *KubeClient) UpdateNamespace(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(NamespaceGVR).Update(ctx, obj, metav1.UpdateOptions{})
+}
+
+func (kc *KubeClient) GetRoleBinding(ctx context.Context, namespace, name string) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(RoleBindingGVR).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+}
+
+func (kc *KubeClient) CreateRoleBinding(ctx context.Context, namespace string, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(RoleBindingGVR).Namespace(namespace).Create(ctx, obj, metav1.CreateOptions{})
+}
+
+func (kc *KubeClient) UpdateRoleBinding(ctx context.Context, namespace string, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(RoleBindingGVR).Namespace(namespace).Update(ctx, obj, metav1.UpdateOptions{})
+}
+
+func (kc *KubeClient) DeleteRoleBinding(ctx context.Context, namespace, name string) error {
+	return kc.dynamic.Resource(RoleBindingGVR).Namespace(namespace).Delete(ctx, name, metav1.DeleteOptions{})
+}
+
+func (kc *KubeClient) ListRoleBindings(ctx context.Context, namespace string, labelSelector string) (*unstructured.UnstructuredList, error) {
+	opts := metav1.ListOptions{}
+	if labelSelector != "" {
+		opts.LabelSelector = labelSelector
+	}
+	return kc.dynamic.Resource(RoleBindingGVR).Namespace(namespace).List(ctx, opts)
 }
