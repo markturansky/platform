@@ -1,0 +1,173 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ambient-api-server
+  labels:
+    app: ambient-api-server
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ambient-api-server-auth
+data:
+  jwks.json: |-
+    {
+      "keys": []
+    }
+  acl.yml: |-
+    - claim: email
+      pattern: ^.*@redhat\.com$
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ambient-api-server
+  labels:
+    app: ambient-api-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ambient-api-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ambient-api-server
+    spec:
+      serviceAccountName: ambient-api-server
+      volumes:
+      - name: rds
+        secret:
+          secretName: ambient-api-server-db
+      - name: authentication
+        configMap:
+          name: ambient-api-server-auth
+      initContainers:
+      - name: migration
+        image: quay.io/ambient_code/ambient_api_server:latest
+        imagePullPolicy: Always
+        volumeMounts:
+        - name: rds
+          mountPath: /secrets/rds
+        command:
+        - /usr/local/bin/ambient-api-server
+        - migrate
+        - --db-host-file=/secrets/rds/db.host
+        - --db-port-file=/secrets/rds/db.port
+        - --db-user-file=/secrets/rds/db.user
+        - --db-password-file=/secrets/rds/db.password
+        - --db-name-file=/secrets/rds/db.name
+        - --alsologtostderr
+        - -v=10
+      containers:
+      - name: ambient-api-server
+        image: quay.io/ambient_code/ambient_api_server:latest
+        imagePullPolicy: Always
+        env:
+        - name: OCM_ENV
+          value: production
+        ports:
+        - containerPort: 8000
+          name: api
+        - containerPort: 4434
+          name: healthcheck
+        volumeMounts:
+        - name: rds
+          mountPath: /secrets/rds
+        - name: authentication
+          mountPath: /configs/authentication
+        command:
+        - /usr/local/bin/ambient-api-server
+        - serve
+        - --db-host-file=/secrets/rds/db.host
+        - --db-port-file=/secrets/rds/db.port
+        - --db-user-file=/secrets/rds/db.user
+        - --db-password-file=/secrets/rds/db.password
+        - --db-name-file=/secrets/rds/db.name
+        - --enable-https=false
+        - --enable-jwt=false
+        - --enable-authz=false
+        - --enable-ocm-mock=true
+        - --enable-health-check-https=false
+        - --enable-metrics-https=false
+        - --api-server-bindaddress=:8000
+        - --health-check-server-bindaddress=:4434
+        - --metrics-server-bindaddress=:4433
+        - --acl-file=/configs/authentication/acl.yml
+        - --jwk-cert-file=/configs/authentication/jwks.json
+        - --db-sslmode=disable
+        - --db-max-open-connections=50
+        - --http-read-timeout=5s
+        - --http-write-timeout=30s
+        - --cors-allowed-origins=*
+        - --cors-allowed-headers=X-Ambient-Project
+        - --enable-sentry=false
+        - --alsologtostderr
+        - -v=10
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /api/ambient-api-server
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 15
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthcheck
+            port: 4434
+            scheme: HTTP
+            httpHeaders:
+            - name: User-Agent
+              value: Probe
+          initialDelaySeconds: 20
+          periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ambient-api-server
+  labels:
+    app: ambient-api-server
+    port: api
+  annotations:
+    description: Exposes and load balances the ambient-api-server pods
+spec:
+  selector:
+    app: ambient-api-server
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: api
+  type: ClusterIP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ambient-api-server-healthcheck
+  labels:
+    app: ambient-api-server
+    port: healthcheck
+spec:
+  selector:
+    app: ambient-api-server
+  ports:
+  - port: 4434
+    targetPort: 4434
+    name: healthcheck
