@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: Template
 metadata:
-  name: trex-db
+  name: ambient-api-server-db
   annotations:
-    description: PostgreSQL database service for use with the RH Trex service
+    description: PostgreSQL database service for the Ambient API Server
     iconClass: icon-postgresql
-    openshift.io/display-name: RH Trex PostgreSQL Database
+    openshift.io/display-name: Ambient API Server PostgreSQL Database
     tags: database,postgresql
 parameters:
 
@@ -14,13 +14,13 @@ parameters:
     description: The name of the OpenShift Service exposed for the database.
     displayName: Database Service Name
     required: true
-    value: trex-db 
+    value: ambient-api-server-db
 
   - name: DATABASE_USER
     description: Username for PostgreSQL user that will be used for accessing the database.
-    displayName: PostgreSQLUsername
+    displayName: PostgreSQL Username
     required: true
-    value: ocm
+    value: ambient
 
   - name: DATABASE_PASSWORD
     description: Password for the PostgreSQL connection user.
@@ -32,7 +32,7 @@ parameters:
     description: Name of the PostgreSQL database accessed.
     displayName: PostgreSQL Database Name
     required: true
-    value: ocmexservice
+    value: ambient_api_server
 
   - name: DATABASE_VOLUME_CAPACITY
     description: Volume space available for data, e.g. 512Mi, 2Gi.
@@ -83,7 +83,7 @@ objects:
     kind: Deployment
     metadata:
       annotations:
-        template.alpha.openshift.io/wait-for-ready: true
+        template.alpha.openshift.io/wait-for-ready: "true"
       name: ${DATABASE_SERVICE_NAME}
     spec:
       replicas: 1
@@ -144,7 +144,6 @@ objects:
           restartPolicy: Always
           volumes:
             - name: ${DATABASE_SERVICE_NAME}-data
-              #emptyDir: {}
               persistentVolumeClaim:
                 claimName: ${DATABASE_SERVICE_NAME}
     status: {}

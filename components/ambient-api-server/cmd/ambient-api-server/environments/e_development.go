@@ -1,9 +1,9 @@
 package environments
 
 import (
-	pkgenv "github.com/openshift-online/rh-trex-ai/pkg/environments"
 	"github.com/openshift-online/rh-trex-ai/pkg/config"
 	"github.com/openshift-online/rh-trex-ai/pkg/db/db_session"
+	pkgenv "github.com/openshift-online/rh-trex-ai/pkg/environments"
 )
 
 type DevEnvImpl struct {
@@ -20,6 +20,7 @@ func (e *DevEnvImpl) OverrideDatabase(c *pkgenv.Database) error {
 func (e *DevEnvImpl) OverrideConfig(c *config.ApplicationConfig) error {
 	c.Server.EnableJWT = false
 	c.Server.EnableHTTPS = false
+	c.Server.CORSAllowedHeaders = []string{"X-Ambient-Project"}
 	return nil
 }
 
@@ -46,5 +47,6 @@ func (e *DevEnvImpl) Flags() map[string]string {
 		"api-server-hostname":    "localhost",
 		"api-server-bindaddress": "localhost:8000",
 		"enable-sentry":          "false",
+		"cors-allowed-origins":   "http://localhost:3000,http://localhost:8080",
 	}
 }

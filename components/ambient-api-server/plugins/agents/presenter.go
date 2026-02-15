@@ -16,6 +16,7 @@ func ConvertAgent(agent openapi.Agent) *Agent {
 	c.Name = agent.Name
 	c.RepoUrl = agent.RepoUrl
 	c.Prompt = agent.Prompt
+	c.ProjectId = agent.ProjectId
 
 	if agent.CreatedAt != nil {
 		c.CreatedAt = *agent.CreatedAt
@@ -36,5 +37,6 @@ func PresentAgent(agent *Agent) openapi.Agent {
 		Name:      agent.Name,
 		RepoUrl:   agent.RepoUrl,
 		Prompt:    agent.Prompt,
+		ProjectId: agent.ProjectId,
 	}
 }

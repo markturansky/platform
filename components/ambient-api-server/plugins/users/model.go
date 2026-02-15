@@ -9,6 +9,7 @@ type User struct {
 	api.Meta
 	Username string `json:"username"`
 	Name     string `json:"name"`
+	Groups   *string `json:"groups"`
 }
 
 type UserList []*User
@@ -30,4 +31,5 @@ func (d *User) BeforeCreate(tx *gorm.DB) error {
 type UserPatchRequest struct {
 	Username *string `json:"username,omitempty"`
 	Name     *string `json:"name,omitempty"`
+	Groups   *string `json:"groups,omitempty"`
 }

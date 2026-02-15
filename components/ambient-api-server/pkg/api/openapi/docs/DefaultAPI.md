@@ -8,9 +8,34 @@ Method | HTTP request | Description
 [**ApiAmbientApiServerV1AgentsIdGet**](DefaultAPI.md#ApiAmbientApiServerV1AgentsIdGet) | **Get** /api/ambient-api-server/v1/agents/{id} | Get an agent by id
 [**ApiAmbientApiServerV1AgentsIdPatch**](DefaultAPI.md#ApiAmbientApiServerV1AgentsIdPatch) | **Patch** /api/ambient-api-server/v1/agents/{id} | Update an agent
 [**ApiAmbientApiServerV1AgentsPost**](DefaultAPI.md#ApiAmbientApiServerV1AgentsPost) | **Post** /api/ambient-api-server/v1/agents | Create a new agent
+[**ApiAmbientApiServerV1PermissionsGet**](DefaultAPI.md#ApiAmbientApiServerV1PermissionsGet) | **Get** /api/ambient-api-server/v1/permissions | Returns a list of permissions
+[**ApiAmbientApiServerV1PermissionsIdGet**](DefaultAPI.md#ApiAmbientApiServerV1PermissionsIdGet) | **Get** /api/ambient-api-server/v1/permissions/{id} | Get an permission by id
+[**ApiAmbientApiServerV1PermissionsIdPatch**](DefaultAPI.md#ApiAmbientApiServerV1PermissionsIdPatch) | **Patch** /api/ambient-api-server/v1/permissions/{id} | Update an permission
+[**ApiAmbientApiServerV1PermissionsPost**](DefaultAPI.md#ApiAmbientApiServerV1PermissionsPost) | **Post** /api/ambient-api-server/v1/permissions | Create a new permission
+[**ApiAmbientApiServerV1ProjectKeysGet**](DefaultAPI.md#ApiAmbientApiServerV1ProjectKeysGet) | **Get** /api/ambient-api-server/v1/project_keys | Returns a list of project keys
+[**ApiAmbientApiServerV1ProjectKeysIdDelete**](DefaultAPI.md#ApiAmbientApiServerV1ProjectKeysIdDelete) | **Delete** /api/ambient-api-server/v1/project_keys/{id} | Revoke a project key
+[**ApiAmbientApiServerV1ProjectKeysIdGet**](DefaultAPI.md#ApiAmbientApiServerV1ProjectKeysIdGet) | **Get** /api/ambient-api-server/v1/project_keys/{id} | Get a project key by id
+[**ApiAmbientApiServerV1ProjectKeysPost**](DefaultAPI.md#ApiAmbientApiServerV1ProjectKeysPost) | **Post** /api/ambient-api-server/v1/project_keys | Create a new project key
+[**ApiAmbientApiServerV1ProjectSettingsGet**](DefaultAPI.md#ApiAmbientApiServerV1ProjectSettingsGet) | **Get** /api/ambient-api-server/v1/project_settings | Returns a list of project settings
+[**ApiAmbientApiServerV1ProjectSettingsIdDelete**](DefaultAPI.md#ApiAmbientApiServerV1ProjectSettingsIdDelete) | **Delete** /api/ambient-api-server/v1/project_settings/{id} | Delete a project settings by id
+[**ApiAmbientApiServerV1ProjectSettingsIdGet**](DefaultAPI.md#ApiAmbientApiServerV1ProjectSettingsIdGet) | **Get** /api/ambient-api-server/v1/project_settings/{id} | Get a project settings by id
+[**ApiAmbientApiServerV1ProjectSettingsIdPatch**](DefaultAPI.md#ApiAmbientApiServerV1ProjectSettingsIdPatch) | **Patch** /api/ambient-api-server/v1/project_settings/{id} | Update a project settings
+[**ApiAmbientApiServerV1ProjectSettingsPost**](DefaultAPI.md#ApiAmbientApiServerV1ProjectSettingsPost) | **Post** /api/ambient-api-server/v1/project_settings | Create a new project settings
+[**ApiAmbientApiServerV1ProjectsGet**](DefaultAPI.md#ApiAmbientApiServerV1ProjectsGet) | **Get** /api/ambient-api-server/v1/projects | Returns a list of projects
+[**ApiAmbientApiServerV1ProjectsIdDelete**](DefaultAPI.md#ApiAmbientApiServerV1ProjectsIdDelete) | **Delete** /api/ambient-api-server/v1/projects/{id} | Delete a project by id
+[**ApiAmbientApiServerV1ProjectsIdGet**](DefaultAPI.md#ApiAmbientApiServerV1ProjectsIdGet) | **Get** /api/ambient-api-server/v1/projects/{id} | Get a project by id
+[**ApiAmbientApiServerV1ProjectsIdPatch**](DefaultAPI.md#ApiAmbientApiServerV1ProjectsIdPatch) | **Patch** /api/ambient-api-server/v1/projects/{id} | Update a project
+[**ApiAmbientApiServerV1ProjectsPost**](DefaultAPI.md#ApiAmbientApiServerV1ProjectsPost) | **Post** /api/ambient-api-server/v1/projects | Create a new project
+[**ApiAmbientApiServerV1RepositoryRefsGet**](DefaultAPI.md#ApiAmbientApiServerV1RepositoryRefsGet) | **Get** /api/ambient-api-server/v1/repository_refs | Returns a list of repositoryRefs
+[**ApiAmbientApiServerV1RepositoryRefsIdGet**](DefaultAPI.md#ApiAmbientApiServerV1RepositoryRefsIdGet) | **Get** /api/ambient-api-server/v1/repository_refs/{id} | Get an repositoryRef by id
+[**ApiAmbientApiServerV1RepositoryRefsIdPatch**](DefaultAPI.md#ApiAmbientApiServerV1RepositoryRefsIdPatch) | **Patch** /api/ambient-api-server/v1/repository_refs/{id} | Update an repositoryRef
+[**ApiAmbientApiServerV1RepositoryRefsPost**](DefaultAPI.md#ApiAmbientApiServerV1RepositoryRefsPost) | **Post** /api/ambient-api-server/v1/repository_refs | Create a new repositoryRef
 [**ApiAmbientApiServerV1SessionsGet**](DefaultAPI.md#ApiAmbientApiServerV1SessionsGet) | **Get** /api/ambient-api-server/v1/sessions | Returns a list of sessions
 [**ApiAmbientApiServerV1SessionsIdGet**](DefaultAPI.md#ApiAmbientApiServerV1SessionsIdGet) | **Get** /api/ambient-api-server/v1/sessions/{id} | Get an session by id
 [**ApiAmbientApiServerV1SessionsIdPatch**](DefaultAPI.md#ApiAmbientApiServerV1SessionsIdPatch) | **Patch** /api/ambient-api-server/v1/sessions/{id} | Update an session
+[**ApiAmbientApiServerV1SessionsIdStartPost**](DefaultAPI.md#ApiAmbientApiServerV1SessionsIdStartPost) | **Post** /api/ambient-api-server/v1/sessions/{id}/start | Start a session
+[**ApiAmbientApiServerV1SessionsIdStatusPatch**](DefaultAPI.md#ApiAmbientApiServerV1SessionsIdStatusPatch) | **Patch** /api/ambient-api-server/v1/sessions/{id}/status | Update session status fields
+[**ApiAmbientApiServerV1SessionsIdStopPost**](DefaultAPI.md#ApiAmbientApiServerV1SessionsIdStopPost) | **Post** /api/ambient-api-server/v1/sessions/{id}/stop | Stop a session
 [**ApiAmbientApiServerV1SessionsPost**](DefaultAPI.md#ApiAmbientApiServerV1SessionsPost) | **Post** /api/ambient-api-server/v1/sessions | Create a new session
 [**ApiAmbientApiServerV1SkillsGet**](DefaultAPI.md#ApiAmbientApiServerV1SkillsGet) | **Get** /api/ambient-api-server/v1/skills | Returns a list of skills
 [**ApiAmbientApiServerV1SkillsIdGet**](DefaultAPI.md#ApiAmbientApiServerV1SkillsIdGet) | **Get** /api/ambient-api-server/v1/skills/{id} | Get an skill by id
@@ -314,6 +339,1508 @@ Name | Type | Description  | Notes
 [[Back to README]](../README.md)
 
 
+## ApiAmbientApiServerV1PermissionsGet
+
+> PermissionList ApiAmbientApiServerV1PermissionsGet(ctx).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+
+Returns a list of permissions
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	page := int32(56) // int32 | Page number of record list when record list exceeds specified page size (optional) (default to 1)
+	size := int32(56) // int32 | Maximum number of records to return (optional) (default to 100)
+	search := "search_example" // string | Specifies the search criteria (optional)
+	orderBy := "orderBy_example" // string | Specifies the order by criteria (optional)
+	fields := "fields_example" // string | Supplies a comma-separated list of fields to be returned (optional)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1PermissionsGet(context.Background()).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1PermissionsGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1PermissionsGet`: PermissionList
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1PermissionsGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1PermissionsGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int32** | Page number of record list when record list exceeds specified page size | [default to 1]
+ **size** | **int32** | Maximum number of records to return | [default to 100]
+ **search** | **string** | Specifies the search criteria | 
+ **orderBy** | **string** | Specifies the order by criteria | 
+ **fields** | **string** | Supplies a comma-separated list of fields to be returned | 
+
+### Return type
+
+[**PermissionList**](PermissionList.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1PermissionsIdGet
+
+> Permission ApiAmbientApiServerV1PermissionsIdGet(ctx, id).Execute()
+
+Get an permission by id
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1PermissionsIdGet(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1PermissionsIdGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1PermissionsIdGet`: Permission
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1PermissionsIdGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1PermissionsIdGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**Permission**](Permission.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1PermissionsIdPatch
+
+> Permission ApiAmbientApiServerV1PermissionsIdPatch(ctx, id).PermissionPatchRequest(permissionPatchRequest).Execute()
+
+Update an permission
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+	permissionPatchRequest := *openapiclient.NewPermissionPatchRequest() // PermissionPatchRequest | Updated permission data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1PermissionsIdPatch(context.Background(), id).PermissionPatchRequest(permissionPatchRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1PermissionsIdPatch``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1PermissionsIdPatch`: Permission
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1PermissionsIdPatch`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1PermissionsIdPatchRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **permissionPatchRequest** | [**PermissionPatchRequest**](PermissionPatchRequest.md) | Updated permission data | 
+
+### Return type
+
+[**Permission**](Permission.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1PermissionsPost
+
+> Permission ApiAmbientApiServerV1PermissionsPost(ctx).Permission(permission).Execute()
+
+Create a new permission
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	permission := *openapiclient.NewPermission("SubjectType_example", "SubjectName_example", "Role_example") // Permission | Permission data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1PermissionsPost(context.Background()).Permission(permission).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1PermissionsPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1PermissionsPost`: Permission
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1PermissionsPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1PermissionsPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **permission** | [**Permission**](Permission.md) | Permission data | 
+
+### Return type
+
+[**Permission**](Permission.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectKeysGet
+
+> ProjectKeyList ApiAmbientApiServerV1ProjectKeysGet(ctx).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+
+Returns a list of project keys
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	page := int32(56) // int32 | Page number of record list when record list exceeds specified page size (optional) (default to 1)
+	size := int32(56) // int32 | Maximum number of records to return (optional) (default to 100)
+	search := "search_example" // string | Specifies the search criteria (optional)
+	orderBy := "orderBy_example" // string | Specifies the order by criteria (optional)
+	fields := "fields_example" // string | Supplies a comma-separated list of fields to be returned (optional)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectKeysGet(context.Background()).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectKeysGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectKeysGet`: ProjectKeyList
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectKeysGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectKeysGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int32** | Page number of record list when record list exceeds specified page size | [default to 1]
+ **size** | **int32** | Maximum number of records to return | [default to 100]
+ **search** | **string** | Specifies the search criteria | 
+ **orderBy** | **string** | Specifies the order by criteria | 
+ **fields** | **string** | Supplies a comma-separated list of fields to be returned | 
+
+### Return type
+
+[**ProjectKeyList**](ProjectKeyList.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectKeysIdDelete
+
+> ApiAmbientApiServerV1ProjectKeysIdDelete(ctx, id).Execute()
+
+Revoke a project key
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectKeysIdDelete(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectKeysIdDelete``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectKeysIdDeleteRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectKeysIdGet
+
+> ProjectKey ApiAmbientApiServerV1ProjectKeysIdGet(ctx, id).Execute()
+
+Get a project key by id
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectKeysIdGet(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectKeysIdGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectKeysIdGet`: ProjectKey
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectKeysIdGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectKeysIdGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**ProjectKey**](ProjectKey.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectKeysPost
+
+> ProjectKey ApiAmbientApiServerV1ProjectKeysPost(ctx).ProjectKey(projectKey).Execute()
+
+Create a new project key
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	projectKey := *openapiclient.NewProjectKey("Name_example") // ProjectKey | Project key data (only name and optional project_id/expires_at are accepted)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectKeysPost(context.Background()).ProjectKey(projectKey).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectKeysPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectKeysPost`: ProjectKey
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectKeysPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectKeysPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **projectKey** | [**ProjectKey**](ProjectKey.md) | Project key data (only name and optional project_id/expires_at are accepted) | 
+
+### Return type
+
+[**ProjectKey**](ProjectKey.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectSettingsGet
+
+> ProjectSettingsList ApiAmbientApiServerV1ProjectSettingsGet(ctx).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+
+Returns a list of project settings
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	page := int32(56) // int32 | Page number of record list when record list exceeds specified page size (optional) (default to 1)
+	size := int32(56) // int32 | Maximum number of records to return (optional) (default to 100)
+	search := "search_example" // string | Specifies the search criteria (optional)
+	orderBy := "orderBy_example" // string | Specifies the order by criteria (optional)
+	fields := "fields_example" // string | Supplies a comma-separated list of fields to be returned (optional)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectSettingsGet(context.Background()).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectSettingsGet`: ProjectSettingsList
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectSettingsGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int32** | Page number of record list when record list exceeds specified page size | [default to 1]
+ **size** | **int32** | Maximum number of records to return | [default to 100]
+ **search** | **string** | Specifies the search criteria | 
+ **orderBy** | **string** | Specifies the order by criteria | 
+ **fields** | **string** | Supplies a comma-separated list of fields to be returned | 
+
+### Return type
+
+[**ProjectSettingsList**](ProjectSettingsList.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectSettingsIdDelete
+
+> ApiAmbientApiServerV1ProjectSettingsIdDelete(ctx, id).Execute()
+
+Delete a project settings by id
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectSettingsIdDelete(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsIdDelete``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectSettingsIdDeleteRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectSettingsIdGet
+
+> ProjectSettings ApiAmbientApiServerV1ProjectSettingsIdGet(ctx, id).Execute()
+
+Get a project settings by id
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectSettingsIdGet(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsIdGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectSettingsIdGet`: ProjectSettings
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsIdGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectSettingsIdGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**ProjectSettings**](ProjectSettings.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectSettingsIdPatch
+
+> ProjectSettings ApiAmbientApiServerV1ProjectSettingsIdPatch(ctx, id).ProjectSettingsPatchRequest(projectSettingsPatchRequest).Execute()
+
+Update a project settings
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+	projectSettingsPatchRequest := *openapiclient.NewProjectSettingsPatchRequest() // ProjectSettingsPatchRequest | Updated project settings data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectSettingsIdPatch(context.Background(), id).ProjectSettingsPatchRequest(projectSettingsPatchRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsIdPatch``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectSettingsIdPatch`: ProjectSettings
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsIdPatch`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectSettingsIdPatchRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **projectSettingsPatchRequest** | [**ProjectSettingsPatchRequest**](ProjectSettingsPatchRequest.md) | Updated project settings data | 
+
+### Return type
+
+[**ProjectSettings**](ProjectSettings.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectSettingsPost
+
+> ProjectSettings ApiAmbientApiServerV1ProjectSettingsPost(ctx).ProjectSettings(projectSettings).Execute()
+
+Create a new project settings
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	projectSettings := *openapiclient.NewProjectSettings("ProjectId_example") // ProjectSettings | Project settings data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectSettingsPost(context.Background()).ProjectSettings(projectSettings).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectSettingsPost`: ProjectSettings
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectSettingsPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectSettingsPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **projectSettings** | [**ProjectSettings**](ProjectSettings.md) | Project settings data | 
+
+### Return type
+
+[**ProjectSettings**](ProjectSettings.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectsGet
+
+> ProjectList ApiAmbientApiServerV1ProjectsGet(ctx).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+
+Returns a list of projects
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	page := int32(56) // int32 | Page number of record list when record list exceeds specified page size (optional) (default to 1)
+	size := int32(56) // int32 | Maximum number of records to return (optional) (default to 100)
+	search := "search_example" // string | Specifies the search criteria (optional)
+	orderBy := "orderBy_example" // string | Specifies the order by criteria (optional)
+	fields := "fields_example" // string | Supplies a comma-separated list of fields to be returned (optional)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectsGet(context.Background()).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectsGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectsGet`: ProjectList
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectsGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectsGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int32** | Page number of record list when record list exceeds specified page size | [default to 1]
+ **size** | **int32** | Maximum number of records to return | [default to 100]
+ **search** | **string** | Specifies the search criteria | 
+ **orderBy** | **string** | Specifies the order by criteria | 
+ **fields** | **string** | Supplies a comma-separated list of fields to be returned | 
+
+### Return type
+
+[**ProjectList**](ProjectList.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectsIdDelete
+
+> ApiAmbientApiServerV1ProjectsIdDelete(ctx, id).Execute()
+
+Delete a project by id
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectsIdDelete(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectsIdDelete``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectsIdDeleteRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectsIdGet
+
+> Project ApiAmbientApiServerV1ProjectsIdGet(ctx, id).Execute()
+
+Get a project by id
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectsIdGet(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectsIdGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectsIdGet`: Project
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectsIdGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectsIdGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**Project**](Project.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectsIdPatch
+
+> Project ApiAmbientApiServerV1ProjectsIdPatch(ctx, id).ProjectPatchRequest(projectPatchRequest).Execute()
+
+Update a project
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+	projectPatchRequest := *openapiclient.NewProjectPatchRequest() // ProjectPatchRequest | Updated project data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectsIdPatch(context.Background(), id).ProjectPatchRequest(projectPatchRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectsIdPatch``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectsIdPatch`: Project
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectsIdPatch`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectsIdPatchRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **projectPatchRequest** | [**ProjectPatchRequest**](ProjectPatchRequest.md) | Updated project data | 
+
+### Return type
+
+[**Project**](Project.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1ProjectsPost
+
+> Project ApiAmbientApiServerV1ProjectsPost(ctx).Project(project).Execute()
+
+Create a new project
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	project := *openapiclient.NewProject("Name_example") // Project | Project data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1ProjectsPost(context.Background()).Project(project).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1ProjectsPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1ProjectsPost`: Project
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1ProjectsPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1ProjectsPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **project** | [**Project**](Project.md) | Project data | 
+
+### Return type
+
+[**Project**](Project.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1RepositoryRefsGet
+
+> RepositoryRefList ApiAmbientApiServerV1RepositoryRefsGet(ctx).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+
+Returns a list of repositoryRefs
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	page := int32(56) // int32 | Page number of record list when record list exceeds specified page size (optional) (default to 1)
+	size := int32(56) // int32 | Maximum number of records to return (optional) (default to 100)
+	search := "search_example" // string | Specifies the search criteria (optional)
+	orderBy := "orderBy_example" // string | Specifies the order by criteria (optional)
+	fields := "fields_example" // string | Supplies a comma-separated list of fields to be returned (optional)
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1RepositoryRefsGet(context.Background()).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1RepositoryRefsGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1RepositoryRefsGet`: RepositoryRefList
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1RepositoryRefsGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1RepositoryRefsGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **page** | **int32** | Page number of record list when record list exceeds specified page size | [default to 1]
+ **size** | **int32** | Maximum number of records to return | [default to 100]
+ **search** | **string** | Specifies the search criteria | 
+ **orderBy** | **string** | Specifies the order by criteria | 
+ **fields** | **string** | Supplies a comma-separated list of fields to be returned | 
+
+### Return type
+
+[**RepositoryRefList**](RepositoryRefList.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1RepositoryRefsIdGet
+
+> RepositoryRef ApiAmbientApiServerV1RepositoryRefsIdGet(ctx, id).Execute()
+
+Get an repositoryRef by id
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1RepositoryRefsIdGet(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1RepositoryRefsIdGet``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1RepositoryRefsIdGet`: RepositoryRef
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1RepositoryRefsIdGet`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1RepositoryRefsIdGetRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**RepositoryRef**](RepositoryRef.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1RepositoryRefsIdPatch
+
+> RepositoryRef ApiAmbientApiServerV1RepositoryRefsIdPatch(ctx, id).RepositoryRefPatchRequest(repositoryRefPatchRequest).Execute()
+
+Update an repositoryRef
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+	repositoryRefPatchRequest := *openapiclient.NewRepositoryRefPatchRequest() // RepositoryRefPatchRequest | Updated repositoryRef data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1RepositoryRefsIdPatch(context.Background(), id).RepositoryRefPatchRequest(repositoryRefPatchRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1RepositoryRefsIdPatch``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1RepositoryRefsIdPatch`: RepositoryRef
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1RepositoryRefsIdPatch`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1RepositoryRefsIdPatchRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **repositoryRefPatchRequest** | [**RepositoryRefPatchRequest**](RepositoryRefPatchRequest.md) | Updated repositoryRef data | 
+
+### Return type
+
+[**RepositoryRef**](RepositoryRef.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1RepositoryRefsPost
+
+> RepositoryRef ApiAmbientApiServerV1RepositoryRefsPost(ctx).RepositoryRef(repositoryRef).Execute()
+
+Create a new repositoryRef
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	repositoryRef := *openapiclient.NewRepositoryRef("Name_example", "Url_example") // RepositoryRef | RepositoryRef data
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1RepositoryRefsPost(context.Background()).RepositoryRef(repositoryRef).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1RepositoryRefsPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1RepositoryRefsPost`: RepositoryRef
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1RepositoryRefsPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1RepositoryRefsPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **repositoryRef** | [**RepositoryRef**](RepositoryRef.md) | RepositoryRef data | 
+
+### Return type
+
+[**RepositoryRef**](RepositoryRef.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## ApiAmbientApiServerV1SessionsGet
 
 > SessionList ApiAmbientApiServerV1SessionsGet(ctx).Page(page).Size(size).Search(search).OrderBy(orderBy).Fields(fields).Execute()
@@ -517,6 +2044,218 @@ Name | Type | Description  | Notes
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1SessionsIdStartPost
+
+> Session ApiAmbientApiServerV1SessionsIdStartPost(ctx, id).Execute()
+
+Start a session
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1SessionsIdStartPost(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1SessionsIdStartPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1SessionsIdStartPost`: Session
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1SessionsIdStartPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1SessionsIdStartPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**Session**](Session.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1SessionsIdStatusPatch
+
+> Session ApiAmbientApiServerV1SessionsIdStatusPatch(ctx, id).SessionStatusPatchRequest(sessionStatusPatchRequest).Execute()
+
+Update session status fields
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+	sessionStatusPatchRequest := *openapiclient.NewSessionStatusPatchRequest() // SessionStatusPatchRequest | Session status fields to update
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1SessionsIdStatusPatch(context.Background(), id).SessionStatusPatchRequest(sessionStatusPatchRequest).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1SessionsIdStatusPatch``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1SessionsIdStatusPatch`: Session
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1SessionsIdStatusPatch`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1SessionsIdStatusPatchRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **sessionStatusPatchRequest** | [**SessionStatusPatchRequest**](SessionStatusPatchRequest.md) | Session status fields to update | 
+
+### Return type
+
+[**Session**](Session.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ApiAmbientApiServerV1SessionsIdStopPost
+
+> Session ApiAmbientApiServerV1SessionsIdStopPost(ctx, id).Execute()
+
+Stop a session
+
+
+
+### Example
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	openapiclient "github.com/GIT_USER_ID/GIT_REPO_ID"
+)
+
+func main() {
+	id := "id_example" // string | The id of record
+
+	configuration := openapiclient.NewConfiguration()
+	apiClient := openapiclient.NewAPIClient(configuration)
+	resp, r, err := apiClient.DefaultAPI.ApiAmbientApiServerV1SessionsIdStopPost(context.Background(), id).Execute()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error when calling `DefaultAPI.ApiAmbientApiServerV1SessionsIdStopPost``: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Full HTTP response: %v\n", r)
+	}
+	// response from `ApiAmbientApiServerV1SessionsIdStopPost`: Session
+	fmt.Fprintf(os.Stdout, "Response from `DefaultAPI.ApiAmbientApiServerV1SessionsIdStopPost`: %v\n", resp)
+}
+```
+
+### Path Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**id** | **string** | The id of record | 
+
+### Other Parameters
+
+Other parameters are passed through a pointer to a apiApiAmbientApiServerV1SessionsIdStopPostRequest struct via the builder pattern
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+### Return type
+
+[**Session**](Session.md)
+
+### Authorization
+
+[Bearer](../README.md#Bearer)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

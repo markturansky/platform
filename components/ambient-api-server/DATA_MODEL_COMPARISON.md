@@ -10,7 +10,7 @@
 |-----------|---------|------|------|
 | **backend** | etcd (K8s CRDs + Namespaces + Secrets) | REST API for frontend. 88 endpoints. Gin + K8s dynamic client. | **Replace entirely** |
 | **public-api** | None (stateless gateway) | Thin proxy: translates `/v1/sessions` ↔ backend's `/api/projects/:p/agentic-sessions/:s`. DTO transformation. | **Remove** — ambient-api-server serves the SDK contract directly |
-| **ambient-api-server** | PostgreSQL (gorm) | REST API with 8 Kinds. rh-trex-ai framework. | **Expand** to cover all backend functionality |
+| **ambient-api-server** | PostgreSQL (gorm) | REST API with 12 Kinds (Agent, Skill, Task, Workflow, WorkflowSkill, WorkflowTask, Session, User, Project, ProjectSettings, Permission, RepositoryRef). rh-trex-ai framework. | **Expand** to cover all backend functionality |
 | **operator** | Watches K8s CRDs | Creates Jobs/Pods from AgenticSession CRs. | **Keep** — unchanged. Reads CRs, not Postgres. |
 | **control-plane** (planned) | Reads Postgres, writes K8s | Reconciler: Postgres rows → K8s resources (Session CR, Namespace, RoleBindings). Syncs CR status back to Postgres. | **Build** |
 | **SDK** (Go + Python) | None | Client library. Wraps the OpenAPI spec into language-friendly clients. | **Expand** — derives types from OpenAPI spec |
@@ -128,10 +128,12 @@ Join tables. No field gaps — complete as designed. Inherit project scoping thr
 
 ### 2.2 Kinds That Exist Only in Backend (must add to API server)
 
-| Kind | Backend Storage | Backend Endpoints | Fields | Priority |
-|------|----------------|-------------------|--------|----------|
-| **Project** | K8s Namespace | 5 CRUD endpoints | `name`, `display_name`, `description`, `labels`, `annotations`, `status` | **HIGH** — needed for multi-tenant isolation |
-| **ProjectSettings** | K8s CRD (singleton) | Implicit via permissions/secrets endpoints | `project_id`, `group_access` (jsonb), `runner_secrets` (jsonb), `repositories` (jsonb) | **HIGH** — drives RBAC and runner config |
+| Kind | Backend Storage | Backend Endpoints | Fields | Priority | Status |
+|------|----------------|-------------------|--------|----------|--------|
+| **Project** | K8s Namespace | 5 CRUD endpoints | `name`, `display_name`, `description`, `labels`, `annotations`, `status` | **HIGH** | **DONE** |
+| **ProjectSettings** | K8s CRD (singleton) | Implicit via permissions/secrets endpoints | `project_id`, `group_access` (jsonb), `repositories` (jsonb) | **HIGH** | **DONE** |
+| **Permission** | K8s RoleBindings | 3 endpoints (GET/POST/DELETE) | `subject_type`, `subject_name`, `role`, `project_id` | **MEDIUM** | **DONE** |
+| **RepositoryRef** | None (bookmark) | 5 CRUD endpoints | `name`, `url`, `branch`, `provider`, `owner`, `repo_name`, `project_id` | **MEDIUM** | **DONE** |
 
 ### 2.3 Backend Capabilities with No Direct Kind (functional endpoints)
 
@@ -144,7 +146,7 @@ These are **not Kinds** in the CRUD sense but are operational endpoints the back
 | **Repository Operations** (5 endpoints) | `GET .../repo/tree`, `GET .../repo/blob`, `GET .../repo/branches`, `GET/POST .../repo/seed` | Proxy to git provider APIs. Stateless — no Postgres storage needed. |
 | **Permissions** (3 endpoints) | `GET/POST/DELETE .../permissions` | Map to ProjectSettings `group_access`. CRUD on the jsonb array. |
 | **Project Keys** (3 endpoints) | `GET/POST/DELETE .../keys` | New Kind or sub-resource of Project. API keys for SDK auth. |
-| **Secrets Management** (5 endpoints) | namespace secrets, runner secrets, integration secrets | Store in Postgres (encrypted at-rest). Replace K8s Secret reads. |
+| **Secrets Management** (5 endpoints) | namespace secrets, runner secrets, integration secrets | **OUT OF SCOPE** — secrets remain in K8s Secrets API, managed by existing backend. Never stored in Postgres. |
 | **OOTB Workflows** (1 endpoint) | `GET /api/workflows/ootb` | Static config or dedicated table. |
 | **MCP Status** (1 endpoint) | `GET .../mcp/status` | Proxy to running pod. |
 | **OAuth Callbacks** (2 endpoints) | `/oauth2callback`, `/oauth2callback/status` | Implement in API server. **Operational note**: callback URIs are registered with external providers (GitHub, Google). Changing the callback URL requires re-registering OAuth apps — this is an operational migration, not just code. Backend uses HMAC-SHA256 signed state params (5-min expiry) to prevent CSRF, with a single callback endpoint dispatching to session-scoped or cluster-scoped flows based on state contents. |
@@ -246,7 +248,7 @@ No `project_id` FK on this table (it *is* the project).
 |--------|------|-------|
 | `project_id` | text, FK → projects, unique | One-to-one with Project |
 | `group_access` | jsonb | `[{group_name, role}]` — drives RoleBinding creation |
-| `runner_secrets` | jsonb | Encrypted key-value pairs for runner config |
+| ~~`runner_secrets`~~ | ~~jsonb~~ | **REMOVED** — secrets stay in K8s Secrets API, not Postgres |
 | `repositories` | jsonb | `[{url, branch, provider}]` — default repos |
 
 ### workflows (add 2 fields)
@@ -378,7 +380,7 @@ The SDK wraps pagination into iterators. The internal format doesn't leak.
 | Priority | What | Backend Endpoints Replaced |
 |----------|------|-----------------------------|
 | P1 | Permissions (CRUD on ProjectSettings.group_access) | 3 endpoints |
-| P1 | Secrets management (encrypted in Postgres) | 5 endpoints |
+| ~~P1~~ | ~~Secrets management~~ | ~~5 endpoints~~ — **REMOVED**: secrets stay in K8s, managed by existing backend |
 | P1 | Project Keys (API key management) | 3 endpoints |
 | P2 | Auth integrations (GitHub, GitLab, Google, Jira) | 17 endpoints |
 | P2 | OOTB Workflows listing | 1 endpoint |

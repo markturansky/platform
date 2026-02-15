@@ -68,6 +68,9 @@ func (h userHandler) Patch(w http.ResponseWriter, r *http.Request) {
 			if patch.Name != nil {
 				found.Name = *patch.Name
 			}
+			if patch.Groups != nil {
+				found.Groups = patch.Groups
+			}
 
 			userModel, err := h.user.Replace(ctx, found)
 			if err != nil {

@@ -82,9 +82,34 @@ Class | Method | HTTP request | Description
 *DefaultAPI* | [**ApiAmbientApiServerV1AgentsIdGet**](docs/DefaultAPI.md#apiambientapiserverv1agentsidget) | **Get** /api/ambient-api-server/v1/agents/{id} | Get an agent by id
 *DefaultAPI* | [**ApiAmbientApiServerV1AgentsIdPatch**](docs/DefaultAPI.md#apiambientapiserverv1agentsidpatch) | **Patch** /api/ambient-api-server/v1/agents/{id} | Update an agent
 *DefaultAPI* | [**ApiAmbientApiServerV1AgentsPost**](docs/DefaultAPI.md#apiambientapiserverv1agentspost) | **Post** /api/ambient-api-server/v1/agents | Create a new agent
+*DefaultAPI* | [**ApiAmbientApiServerV1PermissionsGet**](docs/DefaultAPI.md#apiambientapiserverv1permissionsget) | **Get** /api/ambient-api-server/v1/permissions | Returns a list of permissions
+*DefaultAPI* | [**ApiAmbientApiServerV1PermissionsIdGet**](docs/DefaultAPI.md#apiambientapiserverv1permissionsidget) | **Get** /api/ambient-api-server/v1/permissions/{id} | Get an permission by id
+*DefaultAPI* | [**ApiAmbientApiServerV1PermissionsIdPatch**](docs/DefaultAPI.md#apiambientapiserverv1permissionsidpatch) | **Patch** /api/ambient-api-server/v1/permissions/{id} | Update an permission
+*DefaultAPI* | [**ApiAmbientApiServerV1PermissionsPost**](docs/DefaultAPI.md#apiambientapiserverv1permissionspost) | **Post** /api/ambient-api-server/v1/permissions | Create a new permission
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectKeysGet**](docs/DefaultAPI.md#apiambientapiserverv1projectkeysget) | **Get** /api/ambient-api-server/v1/project_keys | Returns a list of project keys
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectKeysIdDelete**](docs/DefaultAPI.md#apiambientapiserverv1projectkeysiddelete) | **Delete** /api/ambient-api-server/v1/project_keys/{id} | Revoke a project key
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectKeysIdGet**](docs/DefaultAPI.md#apiambientapiserverv1projectkeysidget) | **Get** /api/ambient-api-server/v1/project_keys/{id} | Get a project key by id
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectKeysPost**](docs/DefaultAPI.md#apiambientapiserverv1projectkeyspost) | **Post** /api/ambient-api-server/v1/project_keys | Create a new project key
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectSettingsGet**](docs/DefaultAPI.md#apiambientapiserverv1projectsettingsget) | **Get** /api/ambient-api-server/v1/project_settings | Returns a list of project settings
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectSettingsIdDelete**](docs/DefaultAPI.md#apiambientapiserverv1projectsettingsiddelete) | **Delete** /api/ambient-api-server/v1/project_settings/{id} | Delete a project settings by id
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectSettingsIdGet**](docs/DefaultAPI.md#apiambientapiserverv1projectsettingsidget) | **Get** /api/ambient-api-server/v1/project_settings/{id} | Get a project settings by id
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectSettingsIdPatch**](docs/DefaultAPI.md#apiambientapiserverv1projectsettingsidpatch) | **Patch** /api/ambient-api-server/v1/project_settings/{id} | Update a project settings
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectSettingsPost**](docs/DefaultAPI.md#apiambientapiserverv1projectsettingspost) | **Post** /api/ambient-api-server/v1/project_settings | Create a new project settings
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectsGet**](docs/DefaultAPI.md#apiambientapiserverv1projectsget) | **Get** /api/ambient-api-server/v1/projects | Returns a list of projects
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectsIdDelete**](docs/DefaultAPI.md#apiambientapiserverv1projectsiddelete) | **Delete** /api/ambient-api-server/v1/projects/{id} | Delete a project by id
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectsIdGet**](docs/DefaultAPI.md#apiambientapiserverv1projectsidget) | **Get** /api/ambient-api-server/v1/projects/{id} | Get a project by id
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectsIdPatch**](docs/DefaultAPI.md#apiambientapiserverv1projectsidpatch) | **Patch** /api/ambient-api-server/v1/projects/{id} | Update a project
+*DefaultAPI* | [**ApiAmbientApiServerV1ProjectsPost**](docs/DefaultAPI.md#apiambientapiserverv1projectspost) | **Post** /api/ambient-api-server/v1/projects | Create a new project
+*DefaultAPI* | [**ApiAmbientApiServerV1RepositoryRefsGet**](docs/DefaultAPI.md#apiambientapiserverv1repositoryrefsget) | **Get** /api/ambient-api-server/v1/repository_refs | Returns a list of repositoryRefs
+*DefaultAPI* | [**ApiAmbientApiServerV1RepositoryRefsIdGet**](docs/DefaultAPI.md#apiambientapiserverv1repositoryrefsidget) | **Get** /api/ambient-api-server/v1/repository_refs/{id} | Get an repositoryRef by id
+*DefaultAPI* | [**ApiAmbientApiServerV1RepositoryRefsIdPatch**](docs/DefaultAPI.md#apiambientapiserverv1repositoryrefsidpatch) | **Patch** /api/ambient-api-server/v1/repository_refs/{id} | Update an repositoryRef
+*DefaultAPI* | [**ApiAmbientApiServerV1RepositoryRefsPost**](docs/DefaultAPI.md#apiambientapiserverv1repositoryrefspost) | **Post** /api/ambient-api-server/v1/repository_refs | Create a new repositoryRef
 *DefaultAPI* | [**ApiAmbientApiServerV1SessionsGet**](docs/DefaultAPI.md#apiambientapiserverv1sessionsget) | **Get** /api/ambient-api-server/v1/sessions | Returns a list of sessions
 *DefaultAPI* | [**ApiAmbientApiServerV1SessionsIdGet**](docs/DefaultAPI.md#apiambientapiserverv1sessionsidget) | **Get** /api/ambient-api-server/v1/sessions/{id} | Get an session by id
 *DefaultAPI* | [**ApiAmbientApiServerV1SessionsIdPatch**](docs/DefaultAPI.md#apiambientapiserverv1sessionsidpatch) | **Patch** /api/ambient-api-server/v1/sessions/{id} | Update an session
+*DefaultAPI* | [**ApiAmbientApiServerV1SessionsIdStartPost**](docs/DefaultAPI.md#apiambientapiserverv1sessionsidstartpost) | **Post** /api/ambient-api-server/v1/sessions/{id}/start | Start a session
+*DefaultAPI* | [**ApiAmbientApiServerV1SessionsIdStatusPatch**](docs/DefaultAPI.md#apiambientapiserverv1sessionsidstatuspatch) | **Patch** /api/ambient-api-server/v1/sessions/{id}/status | Update session status fields
+*DefaultAPI* | [**ApiAmbientApiServerV1SessionsIdStopPost**](docs/DefaultAPI.md#apiambientapiserverv1sessionsidstoppost) | **Post** /api/ambient-api-server/v1/sessions/{id}/stop | Stop a session
 *DefaultAPI* | [**ApiAmbientApiServerV1SessionsPost**](docs/DefaultAPI.md#apiambientapiserverv1sessionspost) | **Post** /api/ambient-api-server/v1/sessions | Create a new session
 *DefaultAPI* | [**ApiAmbientApiServerV1SkillsGet**](docs/DefaultAPI.md#apiambientapiserverv1skillsget) | **Get** /api/ambient-api-server/v1/skills | Returns a list of skills
 *DefaultAPI* | [**ApiAmbientApiServerV1SkillsIdGet**](docs/DefaultAPI.md#apiambientapiserverv1skillsidget) | **Get** /api/ambient-api-server/v1/skills/{id} | Get an skill by id
@@ -121,9 +146,25 @@ Class | Method | HTTP request | Description
  - [Error](docs/Error.md)
  - [List](docs/List.md)
  - [ObjectReference](docs/ObjectReference.md)
+ - [Permission](docs/Permission.md)
+ - [PermissionList](docs/PermissionList.md)
+ - [PermissionPatchRequest](docs/PermissionPatchRequest.md)
+ - [Project](docs/Project.md)
+ - [ProjectKey](docs/ProjectKey.md)
+ - [ProjectKeyList](docs/ProjectKeyList.md)
+ - [ProjectKeyPatchRequest](docs/ProjectKeyPatchRequest.md)
+ - [ProjectList](docs/ProjectList.md)
+ - [ProjectPatchRequest](docs/ProjectPatchRequest.md)
+ - [ProjectSettings](docs/ProjectSettings.md)
+ - [ProjectSettingsList](docs/ProjectSettingsList.md)
+ - [ProjectSettingsPatchRequest](docs/ProjectSettingsPatchRequest.md)
+ - [RepositoryRef](docs/RepositoryRef.md)
+ - [RepositoryRefList](docs/RepositoryRefList.md)
+ - [RepositoryRefPatchRequest](docs/RepositoryRefPatchRequest.md)
  - [Session](docs/Session.md)
  - [SessionList](docs/SessionList.md)
  - [SessionPatchRequest](docs/SessionPatchRequest.md)
+ - [SessionStatusPatchRequest](docs/SessionStatusPatchRequest.md)
  - [Skill](docs/Skill.md)
  - [SkillList](docs/SkillList.md)
  - [SkillPatchRequest](docs/SkillPatchRequest.md)

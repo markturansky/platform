@@ -179,6 +179,148 @@ paths:
                 $ref: 'openapi.yaml#/components/schemas/Error'
     parameters:
       - $ref: '#/components/parameters/id'
+  /api/ambient-api-server/v1/sessions/{id}/status:
+    patch:
+      summary: Update session status fields
+      description: Write-back endpoint for control plane to sync runtime status from Kubernetes CR
+      security:
+        - Bearer: []
+      requestBody:
+        description: Session status fields to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionStatusPatchRequest'
+      responses:
+        '200':
+          description: Session status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '400':
+          description: Validation errors occurred
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '401':
+          description: Auth token is invalid
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '403':
+          description: Unauthorized to perform operation
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '404':
+          description: No session with specified id exists
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '500':
+          description: Unexpected error updating session status
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+    parameters:
+      - $ref: '#/components/parameters/id'
+  /api/ambient-api-server/v1/sessions/{id}/start:
+    post:
+      summary: Start a session
+      description: Transitions session phase to Pending. Valid from empty/nil, Stopped, Failed, or Completed phase. Also sets interactive=true.
+      security:
+        - Bearer: []
+      responses:
+        '200':
+          description: Session started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          description: Auth token is invalid
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '403':
+          description: Unauthorized to perform operation
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '404':
+          description: No session with specified id exists
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '409':
+          description: Session is in a phase that cannot be started
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '500':
+          description: Unexpected error occurred
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+    parameters:
+      - $ref: '#/components/parameters/id'
+  /api/ambient-api-server/v1/sessions/{id}/stop:
+    post:
+      summary: Stop a session
+      description: Transitions session phase to Stopping. Valid from Running, Creating, or Pending phase.
+      security:
+        - Bearer: []
+      responses:
+        '200':
+          description: Session stop initiated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        '401':
+          description: Auth token is invalid
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '403':
+          description: Unauthorized to perform operation
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '404':
+          description: No session with specified id exists
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '409':
+          description: Session is in a phase that cannot be stopped
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+        '500':
+          description: Unexpected error occurred
+          content:
+            application/json:
+              schema:
+                $ref: 'openapi.yaml#/components/schemas/Error'
+    parameters:
+      - $ref: '#/components/parameters/id'
 components:
   schemas:
     # NEW SCHEMA START
@@ -198,10 +340,74 @@ components:
               type: string
             created_by_user_id:
               type: string
+              readOnly: true
+              description: Set from authentication token. Cannot be set or modified via API.
             assigned_user_id:
               type: string
             workflow_id:
               type: string
+            repos:
+              type: string
+            interactive:
+              type: boolean
+            timeout:
+              type: integer
+            llm_model:
+              type: string
+            llm_temperature:
+              type: number
+              format: double
+            llm_max_tokens:
+              type: integer
+            parent_session_id:
+              type: string
+            bot_account_name:
+              type: string
+            resource_overrides:
+              type: string
+            environment_variables:
+              type: string
+            labels:
+              type: string
+            annotations:
+              type: string
+            project_id:
+              type: string
+            phase:
+              type: string
+              readOnly: true
+            start_time:
+              type: string
+              format: date-time
+              readOnly: true
+            completion_time:
+              type: string
+              format: date-time
+              readOnly: true
+            sdk_session_id:
+              type: string
+              readOnly: true
+            sdk_restart_count:
+              type: integer
+              readOnly: true
+            conditions:
+              type: string
+              readOnly: true
+            reconciled_repos:
+              type: string
+              readOnly: true
+            reconciled_workflow:
+              type: string
+              readOnly: true
+            kube_cr_name:
+              type: string
+              readOnly: true
+            kube_cr_uid:
+              type: string
+              readOnly: true
+            kube_namespace:
+              type: string
+              readOnly: true
     # NEW SCHEMA START
     SessionList:
     # NEW SCHEMA END
@@ -224,11 +430,61 @@ components:
           type: string
         prompt:
           type: string
-        created_by_user_id:
-          type: string
         assigned_user_id:
           type: string
         workflow_id:
+          type: string
+        repos:
+          type: string
+        interactive:
+          type: boolean
+        timeout:
+          type: integer
+        llm_model:
+          type: string
+        llm_temperature:
+          type: number
+          format: double
+        llm_max_tokens:
+          type: integer
+        parent_session_id:
+          type: string
+        bot_account_name:
+          type: string
+        resource_overrides:
+          type: string
+        environment_variables:
+          type: string
+        labels:
+          type: string
+        annotations:
+          type: string
+        project_id:
+          type: string
+    SessionStatusPatchRequest:
+      type: object
+      properties:
+        phase:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        completion_time:
+          type: string
+          format: date-time
+        sdk_session_id:
+          type: string
+        sdk_restart_count:
+          type: integer
+        conditions:
+          type: string
+        reconciled_repos:
+          type: string
+        reconciled_workflow:
+          type: string
+        kube_cr_uid:
+          type: string
+        kube_namespace:
           type: string
   parameters:
       id:

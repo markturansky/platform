@@ -16,6 +16,7 @@ func ConvertTask(task openapi.Task) *Task {
 	c.Name = task.Name
 	c.RepoUrl = task.RepoUrl
 	c.Prompt = task.Prompt
+	c.ProjectId = task.ProjectId
 
 	if task.CreatedAt != nil {
 		c.CreatedAt = *task.CreatedAt
@@ -36,5 +37,6 @@ func PresentTask(task *Task) openapi.Task {
 		Name:      task.Name,
 		RepoUrl:   task.RepoUrl,
 		Prompt:    task.Prompt,
+		ProjectId: task.ProjectId,
 	}
 }

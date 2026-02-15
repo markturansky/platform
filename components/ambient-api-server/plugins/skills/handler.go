@@ -71,6 +71,9 @@ func (h skillHandler) Patch(w http.ResponseWriter, r *http.Request) {
 			if patch.Prompt != nil {
 				found.Prompt = patch.Prompt
 			}
+			if patch.ProjectId != nil {
+				found.ProjectId = patch.ProjectId
+			}
 
 			skillModel, err := h.skill.Replace(ctx, found)
 			if err != nil {

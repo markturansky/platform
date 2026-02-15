@@ -36,3 +36,15 @@ func constraintMigration() *gormigrate.Migration {
 		},
 	}
 }
+
+func groupsMigration() *gormigrate.Migration {
+	return &gormigrate.Migration{
+		ID: "202602150034",
+		Migrate: func(tx *gorm.DB) error {
+			return tx.Exec(`ALTER TABLE users ADD COLUMN IF NOT EXISTS groups TEXT`).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Exec(`ALTER TABLE users DROP COLUMN IF EXISTS groups`).Error
+		},
+	}
+}

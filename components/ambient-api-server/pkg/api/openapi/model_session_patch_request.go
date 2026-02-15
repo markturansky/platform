@@ -20,12 +20,24 @@ var _ MappedNullable = &SessionPatchRequest{}
 
 // SessionPatchRequest struct for SessionPatchRequest
 type SessionPatchRequest struct {
-	Name            *string `json:"name,omitempty"`
-	RepoUrl         *string `json:"repo_url,omitempty"`
-	Prompt          *string `json:"prompt,omitempty"`
-	CreatedByUserId *string `json:"created_by_user_id,omitempty"`
-	AssignedUserId  *string `json:"assigned_user_id,omitempty"`
-	WorkflowId      *string `json:"workflow_id,omitempty"`
+	Name                 *string  `json:"name,omitempty"`
+	RepoUrl              *string  `json:"repo_url,omitempty"`
+	Prompt               *string  `json:"prompt,omitempty"`
+	AssignedUserId       *string  `json:"assigned_user_id,omitempty"`
+	WorkflowId           *string  `json:"workflow_id,omitempty"`
+	Repos                *string  `json:"repos,omitempty"`
+	Interactive          *bool    `json:"interactive,omitempty"`
+	Timeout              *int32   `json:"timeout,omitempty"`
+	LlmModel             *string  `json:"llm_model,omitempty"`
+	LlmTemperature       *float64 `json:"llm_temperature,omitempty"`
+	LlmMaxTokens         *int32   `json:"llm_max_tokens,omitempty"`
+	ParentSessionId      *string  `json:"parent_session_id,omitempty"`
+	BotAccountName       *string  `json:"bot_account_name,omitempty"`
+	ResourceOverrides    *string  `json:"resource_overrides,omitempty"`
+	EnvironmentVariables *string  `json:"environment_variables,omitempty"`
+	Labels               *string  `json:"labels,omitempty"`
+	Annotations          *string  `json:"annotations,omitempty"`
+	ProjectId            *string  `json:"project_id,omitempty"`
 }
 
 // NewSessionPatchRequest instantiates a new SessionPatchRequest object
@@ -141,38 +153,6 @@ func (o *SessionPatchRequest) SetPrompt(v string) {
 	o.Prompt = &v
 }
 
-// GetCreatedByUserId returns the CreatedByUserId field value if set, zero value otherwise.
-func (o *SessionPatchRequest) GetCreatedByUserId() string {
-	if o == nil || IsNil(o.CreatedByUserId) {
-		var ret string
-		return ret
-	}
-	return *o.CreatedByUserId
-}
-
-// GetCreatedByUserIdOk returns a tuple with the CreatedByUserId field value if set, nil otherwise
-// and a boolean to check if the value has been set.
-func (o *SessionPatchRequest) GetCreatedByUserIdOk() (*string, bool) {
-	if o == nil || IsNil(o.CreatedByUserId) {
-		return nil, false
-	}
-	return o.CreatedByUserId, true
-}
-
-// HasCreatedByUserId returns a boolean if a field has been set.
-func (o *SessionPatchRequest) HasCreatedByUserId() bool {
-	if o != nil && !IsNil(o.CreatedByUserId) {
-		return true
-	}
-
-	return false
-}
-
-// SetCreatedByUserId gets a reference to the given string and assigns it to the CreatedByUserId field.
-func (o *SessionPatchRequest) SetCreatedByUserId(v string) {
-	o.CreatedByUserId = &v
-}
-
 // GetAssignedUserId returns the AssignedUserId field value if set, zero value otherwise.
 func (o *SessionPatchRequest) GetAssignedUserId() string {
 	if o == nil || IsNil(o.AssignedUserId) {
@@ -237,6 +217,422 @@ func (o *SessionPatchRequest) SetWorkflowId(v string) {
 	o.WorkflowId = &v
 }
 
+// GetRepos returns the Repos field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetRepos() string {
+	if o == nil || IsNil(o.Repos) {
+		var ret string
+		return ret
+	}
+	return *o.Repos
+}
+
+// GetReposOk returns a tuple with the Repos field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetReposOk() (*string, bool) {
+	if o == nil || IsNil(o.Repos) {
+		return nil, false
+	}
+	return o.Repos, true
+}
+
+// HasRepos returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasRepos() bool {
+	if o != nil && !IsNil(o.Repos) {
+		return true
+	}
+
+	return false
+}
+
+// SetRepos gets a reference to the given string and assigns it to the Repos field.
+func (o *SessionPatchRequest) SetRepos(v string) {
+	o.Repos = &v
+}
+
+// GetInteractive returns the Interactive field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetInteractive() bool {
+	if o == nil || IsNil(o.Interactive) {
+		var ret bool
+		return ret
+	}
+	return *o.Interactive
+}
+
+// GetInteractiveOk returns a tuple with the Interactive field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetInteractiveOk() (*bool, bool) {
+	if o == nil || IsNil(o.Interactive) {
+		return nil, false
+	}
+	return o.Interactive, true
+}
+
+// HasInteractive returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasInteractive() bool {
+	if o != nil && !IsNil(o.Interactive) {
+		return true
+	}
+
+	return false
+}
+
+// SetInteractive gets a reference to the given bool and assigns it to the Interactive field.
+func (o *SessionPatchRequest) SetInteractive(v bool) {
+	o.Interactive = &v
+}
+
+// GetTimeout returns the Timeout field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetTimeout() int32 {
+	if o == nil || IsNil(o.Timeout) {
+		var ret int32
+		return ret
+	}
+	return *o.Timeout
+}
+
+// GetTimeoutOk returns a tuple with the Timeout field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetTimeoutOk() (*int32, bool) {
+	if o == nil || IsNil(o.Timeout) {
+		return nil, false
+	}
+	return o.Timeout, true
+}
+
+// HasTimeout returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasTimeout() bool {
+	if o != nil && !IsNil(o.Timeout) {
+		return true
+	}
+
+	return false
+}
+
+// SetTimeout gets a reference to the given int32 and assigns it to the Timeout field.
+func (o *SessionPatchRequest) SetTimeout(v int32) {
+	o.Timeout = &v
+}
+
+// GetLlmModel returns the LlmModel field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetLlmModel() string {
+	if o == nil || IsNil(o.LlmModel) {
+		var ret string
+		return ret
+	}
+	return *o.LlmModel
+}
+
+// GetLlmModelOk returns a tuple with the LlmModel field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetLlmModelOk() (*string, bool) {
+	if o == nil || IsNil(o.LlmModel) {
+		return nil, false
+	}
+	return o.LlmModel, true
+}
+
+// HasLlmModel returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasLlmModel() bool {
+	if o != nil && !IsNil(o.LlmModel) {
+		return true
+	}
+
+	return false
+}
+
+// SetLlmModel gets a reference to the given string and assigns it to the LlmModel field.
+func (o *SessionPatchRequest) SetLlmModel(v string) {
+	o.LlmModel = &v
+}
+
+// GetLlmTemperature returns the LlmTemperature field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetLlmTemperature() float64 {
+	if o == nil || IsNil(o.LlmTemperature) {
+		var ret float64
+		return ret
+	}
+	return *o.LlmTemperature
+}
+
+// GetLlmTemperatureOk returns a tuple with the LlmTemperature field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetLlmTemperatureOk() (*float64, bool) {
+	if o == nil || IsNil(o.LlmTemperature) {
+		return nil, false
+	}
+	return o.LlmTemperature, true
+}
+
+// HasLlmTemperature returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasLlmTemperature() bool {
+	if o != nil && !IsNil(o.LlmTemperature) {
+		return true
+	}
+
+	return false
+}
+
+// SetLlmTemperature gets a reference to the given float64 and assigns it to the LlmTemperature field.
+func (o *SessionPatchRequest) SetLlmTemperature(v float64) {
+	o.LlmTemperature = &v
+}
+
+// GetLlmMaxTokens returns the LlmMaxTokens field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetLlmMaxTokens() int32 {
+	if o == nil || IsNil(o.LlmMaxTokens) {
+		var ret int32
+		return ret
+	}
+	return *o.LlmMaxTokens
+}
+
+// GetLlmMaxTokensOk returns a tuple with the LlmMaxTokens field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetLlmMaxTokensOk() (*int32, bool) {
+	if o == nil || IsNil(o.LlmMaxTokens) {
+		return nil, false
+	}
+	return o.LlmMaxTokens, true
+}
+
+// HasLlmMaxTokens returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasLlmMaxTokens() bool {
+	if o != nil && !IsNil(o.LlmMaxTokens) {
+		return true
+	}
+
+	return false
+}
+
+// SetLlmMaxTokens gets a reference to the given int32 and assigns it to the LlmMaxTokens field.
+func (o *SessionPatchRequest) SetLlmMaxTokens(v int32) {
+	o.LlmMaxTokens = &v
+}
+
+// GetParentSessionId returns the ParentSessionId field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetParentSessionId() string {
+	if o == nil || IsNil(o.ParentSessionId) {
+		var ret string
+		return ret
+	}
+	return *o.ParentSessionId
+}
+
+// GetParentSessionIdOk returns a tuple with the ParentSessionId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetParentSessionIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ParentSessionId) {
+		return nil, false
+	}
+	return o.ParentSessionId, true
+}
+
+// HasParentSessionId returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasParentSessionId() bool {
+	if o != nil && !IsNil(o.ParentSessionId) {
+		return true
+	}
+
+	return false
+}
+
+// SetParentSessionId gets a reference to the given string and assigns it to the ParentSessionId field.
+func (o *SessionPatchRequest) SetParentSessionId(v string) {
+	o.ParentSessionId = &v
+}
+
+// GetBotAccountName returns the BotAccountName field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetBotAccountName() string {
+	if o == nil || IsNil(o.BotAccountName) {
+		var ret string
+		return ret
+	}
+	return *o.BotAccountName
+}
+
+// GetBotAccountNameOk returns a tuple with the BotAccountName field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetBotAccountNameOk() (*string, bool) {
+	if o == nil || IsNil(o.BotAccountName) {
+		return nil, false
+	}
+	return o.BotAccountName, true
+}
+
+// HasBotAccountName returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasBotAccountName() bool {
+	if o != nil && !IsNil(o.BotAccountName) {
+		return true
+	}
+
+	return false
+}
+
+// SetBotAccountName gets a reference to the given string and assigns it to the BotAccountName field.
+func (o *SessionPatchRequest) SetBotAccountName(v string) {
+	o.BotAccountName = &v
+}
+
+// GetResourceOverrides returns the ResourceOverrides field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetResourceOverrides() string {
+	if o == nil || IsNil(o.ResourceOverrides) {
+		var ret string
+		return ret
+	}
+	return *o.ResourceOverrides
+}
+
+// GetResourceOverridesOk returns a tuple with the ResourceOverrides field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetResourceOverridesOk() (*string, bool) {
+	if o == nil || IsNil(o.ResourceOverrides) {
+		return nil, false
+	}
+	return o.ResourceOverrides, true
+}
+
+// HasResourceOverrides returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasResourceOverrides() bool {
+	if o != nil && !IsNil(o.ResourceOverrides) {
+		return true
+	}
+
+	return false
+}
+
+// SetResourceOverrides gets a reference to the given string and assigns it to the ResourceOverrides field.
+func (o *SessionPatchRequest) SetResourceOverrides(v string) {
+	o.ResourceOverrides = &v
+}
+
+// GetEnvironmentVariables returns the EnvironmentVariables field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetEnvironmentVariables() string {
+	if o == nil || IsNil(o.EnvironmentVariables) {
+		var ret string
+		return ret
+	}
+	return *o.EnvironmentVariables
+}
+
+// GetEnvironmentVariablesOk returns a tuple with the EnvironmentVariables field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetEnvironmentVariablesOk() (*string, bool) {
+	if o == nil || IsNil(o.EnvironmentVariables) {
+		return nil, false
+	}
+	return o.EnvironmentVariables, true
+}
+
+// HasEnvironmentVariables returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasEnvironmentVariables() bool {
+	if o != nil && !IsNil(o.EnvironmentVariables) {
+		return true
+	}
+
+	return false
+}
+
+// SetEnvironmentVariables gets a reference to the given string and assigns it to the EnvironmentVariables field.
+func (o *SessionPatchRequest) SetEnvironmentVariables(v string) {
+	o.EnvironmentVariables = &v
+}
+
+// GetLabels returns the Labels field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetLabels() string {
+	if o == nil || IsNil(o.Labels) {
+		var ret string
+		return ret
+	}
+	return *o.Labels
+}
+
+// GetLabelsOk returns a tuple with the Labels field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetLabelsOk() (*string, bool) {
+	if o == nil || IsNil(o.Labels) {
+		return nil, false
+	}
+	return o.Labels, true
+}
+
+// HasLabels returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasLabels() bool {
+	if o != nil && !IsNil(o.Labels) {
+		return true
+	}
+
+	return false
+}
+
+// SetLabels gets a reference to the given string and assigns it to the Labels field.
+func (o *SessionPatchRequest) SetLabels(v string) {
+	o.Labels = &v
+}
+
+// GetAnnotations returns the Annotations field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetAnnotations() string {
+	if o == nil || IsNil(o.Annotations) {
+		var ret string
+		return ret
+	}
+	return *o.Annotations
+}
+
+// GetAnnotationsOk returns a tuple with the Annotations field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetAnnotationsOk() (*string, bool) {
+	if o == nil || IsNil(o.Annotations) {
+		return nil, false
+	}
+	return o.Annotations, true
+}
+
+// HasAnnotations returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasAnnotations() bool {
+	if o != nil && !IsNil(o.Annotations) {
+		return true
+	}
+
+	return false
+}
+
+// SetAnnotations gets a reference to the given string and assigns it to the Annotations field.
+func (o *SessionPatchRequest) SetAnnotations(v string) {
+	o.Annotations = &v
+}
+
+// GetProjectId returns the ProjectId field value if set, zero value otherwise.
+func (o *SessionPatchRequest) GetProjectId() string {
+	if o == nil || IsNil(o.ProjectId) {
+		var ret string
+		return ret
+	}
+	return *o.ProjectId
+}
+
+// GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *SessionPatchRequest) GetProjectIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ProjectId) {
+		return nil, false
+	}
+	return o.ProjectId, true
+}
+
+// HasProjectId returns a boolean if a field has been set.
+func (o *SessionPatchRequest) HasProjectId() bool {
+	if o != nil && !IsNil(o.ProjectId) {
+		return true
+	}
+
+	return false
+}
+
+// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+func (o *SessionPatchRequest) SetProjectId(v string) {
+	o.ProjectId = &v
+}
+
 func (o SessionPatchRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -256,14 +652,50 @@ func (o SessionPatchRequest) ToMap() (map[string]interface{}, error) {
 	if !IsNil(o.Prompt) {
 		toSerialize["prompt"] = o.Prompt
 	}
-	if !IsNil(o.CreatedByUserId) {
-		toSerialize["created_by_user_id"] = o.CreatedByUserId
-	}
 	if !IsNil(o.AssignedUserId) {
 		toSerialize["assigned_user_id"] = o.AssignedUserId
 	}
 	if !IsNil(o.WorkflowId) {
 		toSerialize["workflow_id"] = o.WorkflowId
+	}
+	if !IsNil(o.Repos) {
+		toSerialize["repos"] = o.Repos
+	}
+	if !IsNil(o.Interactive) {
+		toSerialize["interactive"] = o.Interactive
+	}
+	if !IsNil(o.Timeout) {
+		toSerialize["timeout"] = o.Timeout
+	}
+	if !IsNil(o.LlmModel) {
+		toSerialize["llm_model"] = o.LlmModel
+	}
+	if !IsNil(o.LlmTemperature) {
+		toSerialize["llm_temperature"] = o.LlmTemperature
+	}
+	if !IsNil(o.LlmMaxTokens) {
+		toSerialize["llm_max_tokens"] = o.LlmMaxTokens
+	}
+	if !IsNil(o.ParentSessionId) {
+		toSerialize["parent_session_id"] = o.ParentSessionId
+	}
+	if !IsNil(o.BotAccountName) {
+		toSerialize["bot_account_name"] = o.BotAccountName
+	}
+	if !IsNil(o.ResourceOverrides) {
+		toSerialize["resource_overrides"] = o.ResourceOverrides
+	}
+	if !IsNil(o.EnvironmentVariables) {
+		toSerialize["environment_variables"] = o.EnvironmentVariables
+	}
+	if !IsNil(o.Labels) {
+		toSerialize["labels"] = o.Labels
+	}
+	if !IsNil(o.Annotations) {
+		toSerialize["annotations"] = o.Annotations
+	}
+	if !IsNil(o.ProjectId) {
+		toSerialize["project_id"] = o.ProjectId
 	}
 	return toSerialize, nil
 }

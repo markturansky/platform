@@ -196,6 +196,8 @@ components:
               type: string
             prompt:
               type: string
+            project_id:
+              type: string
     # NEW SCHEMA START
     AgentList:
     # NEW SCHEMA END
@@ -217,6 +219,8 @@ components:
         repo_url:
           type: string
         prompt:
+          type: string
+        project_id:
           type: string
   parameters:
       id:

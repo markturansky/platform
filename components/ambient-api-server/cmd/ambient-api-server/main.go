@@ -7,6 +7,7 @@ import (
 	pkgcmd "github.com/openshift-online/rh-trex-ai/pkg/cmd"
 
 	_ "github.com/ambient/platform/components/ambient-api-server/cmd/ambient-api-server/environments"
+	_ "github.com/ambient/platform/components/ambient-api-server/pkg/middleware"
 
 	_ "github.com/ambient/platform/components/ambient-api-server/plugins/users"
 	_ "github.com/openshift-online/rh-trex-ai/plugins/events"
@@ -18,6 +19,11 @@ import (
 	_ "github.com/ambient/platform/components/ambient-api-server/plugins/sessions"
 	_ "github.com/ambient/platform/components/ambient-api-server/plugins/workflowSkills"
 	_ "github.com/ambient/platform/components/ambient-api-server/plugins/workflowTasks"
+	_ "github.com/ambient/platform/components/ambient-api-server/plugins/projects"
+	_ "github.com/ambient/platform/components/ambient-api-server/plugins/projectSettings"
+	_ "github.com/ambient/platform/components/ambient-api-server/plugins/permissions"
+	_ "github.com/ambient/platform/components/ambient-api-server/plugins/repositoryRefs"
+	_ "github.com/ambient/platform/components/ambient-api-server/plugins/projectKeys"
 )
 
 func main() {

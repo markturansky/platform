@@ -53,6 +53,9 @@ func init() {
 		sessionsRouter.HandleFunc("/{id}", sessionHandler.Get).Methods(http.MethodGet)
 		sessionsRouter.HandleFunc("", sessionHandler.Create).Methods(http.MethodPost)
 		sessionsRouter.HandleFunc("/{id}", sessionHandler.Patch).Methods(http.MethodPatch)
+		sessionsRouter.HandleFunc("/{id}/status", sessionHandler.PatchStatus).Methods(http.MethodPatch)
+		sessionsRouter.HandleFunc("/{id}/start", sessionHandler.Start).Methods(http.MethodPost)
+		sessionsRouter.HandleFunc("/{id}/stop", sessionHandler.Stop).Methods(http.MethodPost)
 		sessionsRouter.HandleFunc("/{id}", sessionHandler.Delete).Methods(http.MethodDelete)
 		sessionsRouter.Use(authMiddleware.AuthenticateAccountJWT)
 		sessionsRouter.Use(authzMiddleware.AuthorizeApi)
@@ -78,4 +81,5 @@ func init() {
 
 	db.RegisterMigration(migration())
 	db.RegisterMigration(constraintMigration())
+	db.RegisterMigration(schemaExpansionMigration())
 }

@@ -23,6 +23,9 @@ type SessionService interface {
 	Replace(ctx context.Context, session *Session) (*Session, *errors.ServiceError)
 	Delete(ctx context.Context, id string) *errors.ServiceError
 	All(ctx context.Context) (SessionList, *errors.ServiceError)
+	UpdateStatus(ctx context.Context, id string, patch *SessionStatusPatchRequest) (*Session, *errors.ServiceError)
+	Start(ctx context.Context, id string) (*Session, *errors.ServiceError)
+	Stop(ctx context.Context, id string) (*Session, *errors.ServiceError)
 
 	FindByIDs(ctx context.Context, ids []string) (SessionList, *errors.ServiceError)
 
@@ -159,4 +162,130 @@ func (s *sqlSessionService) All(ctx context.Context) (SessionList, *errors.Servi
 		return nil, errors.GeneralError("Unable to get all sessions: %s", err)
 	}
 	return sessions, nil
+}
+
+func (s *sqlSessionService) UpdateStatus(ctx context.Context, id string, patch *SessionStatusPatchRequest) (*Session, *errors.ServiceError) {
+	session, err := s.sessionDao.Get(ctx, id)
+	if err != nil {
+		return nil, services.HandleGetError("Session", "id", id, err)
+	}
+
+	if patch.Phase != nil {
+		session.Phase = patch.Phase
+	}
+	if patch.StartTime != nil {
+		session.StartTime = patch.StartTime
+	}
+	if patch.CompletionTime != nil {
+		session.CompletionTime = patch.CompletionTime
+	}
+	if patch.SdkSessionId != nil {
+		session.SdkSessionId = patch.SdkSessionId
+	}
+	if patch.SdkRestartCount != nil {
+		session.SdkRestartCount = patch.SdkRestartCount
+	}
+	if patch.Conditions != nil {
+		session.Conditions = patch.Conditions
+	}
+	if patch.ReconciledRepos != nil {
+		session.ReconciledRepos = patch.ReconciledRepos
+	}
+	if patch.ReconciledWorkflow != nil {
+		session.ReconciledWorkflow = patch.ReconciledWorkflow
+	}
+	if patch.KubeCrUid != nil {
+		session.KubeCrUid = patch.KubeCrUid
+	}
+	if patch.KubeNamespace != nil {
+		session.KubeNamespace = patch.KubeNamespace
+	}
+
+	session, err = s.sessionDao.Replace(ctx, session)
+	if err != nil {
+		return nil, services.HandleUpdateError("Session", err)
+	}
+
+	_, evErr := s.events.Create(ctx, &api.Event{
+		Source:    "Sessions",
+		SourceID:  session.ID,
+		EventType: api.UpdateEventType,
+	})
+	if evErr != nil {
+		return nil, services.HandleUpdateError("Session", evErr)
+	}
+
+	return session, nil
+}
+
+func (s *sqlSessionService) Start(ctx context.Context, id string) (*Session, *errors.ServiceError) {
+	session, err := s.sessionDao.Get(ctx, id)
+	if err != nil {
+		return nil, services.HandleGetError("Session", "id", id, err)
+	}
+
+	currentPhase := ""
+	if session.Phase != nil {
+		currentPhase = *session.Phase
+	}
+
+	if currentPhase != "" && currentPhase != "Stopped" && currentPhase != "Failed" && currentPhase != "Completed" {
+		return nil, errors.Conflict("cannot start session in phase %q; must be empty, Stopped, Failed, or Completed", currentPhase)
+	}
+
+	pending := "Pending"
+	session.Phase = &pending
+	interactive := true
+	session.Interactive = &interactive
+
+	session, err = s.sessionDao.Replace(ctx, session)
+	if err != nil {
+		return nil, services.HandleUpdateError("Session", err)
+	}
+
+	_, evErr := s.events.Create(ctx, &api.Event{
+		Source:    "Sessions",
+		SourceID:  session.ID,
+		EventType: api.UpdateEventType,
+	})
+	if evErr != nil {
+		return nil, services.HandleUpdateError("Session", evErr)
+	}
+
+	return session, nil
+}
+
+func (s *sqlSessionService) Stop(ctx context.Context, id string) (*Session, *errors.ServiceError) {
+	session, err := s.sessionDao.Get(ctx, id)
+	if err != nil {
+		return nil, services.HandleGetError("Session", "id", id, err)
+	}
+
+	currentPhase := ""
+	if session.Phase != nil {
+		currentPhase = *session.Phase
+	}
+
+	if currentPhase != "Running" && currentPhase != "Creating" && currentPhase != "Pending" {
+		return nil, errors.Conflict("cannot stop session in phase %q; must be Running, Creating, or Pending", currentPhase)
+	}
+
+	stopping := "Stopping"
+	session.Phase = &stopping
+
+	session, err = s.sessionDao.Replace(ctx, session)
+	if err != nil {
+		return nil, services.HandleUpdateError("Session", err)
+	}
+
+	_, evErr := s.events.Create(ctx, &api.Event{
+		Source:    "Sessions",
+		SourceID:  session.ID,
+		EventType: api.UpdateEventType,
+	})
+	if evErr != nil {
+		return nil, services.HandleUpdateError("Session", evErr)
+	}
+
+	return session, nil
 }

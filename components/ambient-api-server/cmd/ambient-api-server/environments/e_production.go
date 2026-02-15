@@ -1,9 +1,9 @@
 package environments
 
 import (
-	pkgenv "github.com/openshift-online/rh-trex-ai/pkg/environments"
 	"github.com/openshift-online/rh-trex-ai/pkg/config"
 	"github.com/openshift-online/rh-trex-ai/pkg/db/db_session"
+	pkgenv "github.com/openshift-online/rh-trex-ai/pkg/environments"
 )
 
 var _ pkgenv.EnvironmentImpl = &ProductionEnvImpl{}
@@ -18,6 +18,7 @@ func (e *ProductionEnvImpl) OverrideDatabase(c *pkgenv.Database) error {
 }
 
 func (e *ProductionEnvImpl) OverrideConfig(c *config.ApplicationConfig) error {
+	c.Server.CORSAllowedHeaders = []string{"X-Ambient-Project"}
 	return nil
 }
 

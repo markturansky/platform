@@ -74,6 +74,15 @@ func (h workflowHandler) Patch(w http.ResponseWriter, r *http.Request) {
 			if patch.AgentId != nil {
 				found.AgentId = patch.AgentId
 			}
+			if patch.ProjectId != nil {
+				found.ProjectId = patch.ProjectId
+			}
+			if patch.Branch != nil {
+				found.Branch = patch.Branch
+			}
+			if patch.Path != nil {
+				found.Path = patch.Path
+			}
 
 			workflowModel, err := h.workflow.Replace(ctx, found)
 			if err != nil {

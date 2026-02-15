@@ -63,3 +63,38 @@ func constraintMigration() *gormigrate.Migration {
 		},
 	}
 }
+
+func projectIdMigration() *gormigrate.Migration {
+	migrateStatements := []string{
+		`ALTER TABLE workflows ADD COLUMN IF NOT EXISTS project_id TEXT`,
+		`ALTER TABLE workflows ADD COLUMN IF NOT EXISTS branch TEXT`,
+		`ALTER TABLE workflows ADD COLUMN IF NOT EXISTS path TEXT`,
+		`CREATE INDEX IF NOT EXISTS idx_workflows_project_id ON workflows(project_id)`,
+	}
+	rollbackStatements := []string{
+		`DROP INDEX IF EXISTS idx_workflows_project_id`,
+		`ALTER TABLE workflows DROP COLUMN IF EXISTS project_id`,
+		`ALTER TABLE workflows DROP COLUMN IF EXISTS branch`,
+		`ALTER TABLE workflows DROP COLUMN IF EXISTS path`,
+	}
+
+	return &gormigrate.Migration{
+		ID: "202602150033",
+		Migrate: func(tx *gorm.DB) error {
+			for _, stmt := range migrateStatements {
+				if err := tx.Exec(stmt).Error; err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			for _, stmt := range rollbackStatements {
+				if err := tx.Exec(stmt).Error; err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+	}
+}

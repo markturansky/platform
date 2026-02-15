@@ -30,6 +30,7 @@ type User struct {
 	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 	Username  string     `json:"username"`
 	Name      string     `json:"name"`
+	Groups    *string    `json:"groups,omitempty"`
 }
 
 type _User User
@@ -261,6 +262,38 @@ func (o *User) SetName(v string) {
 	o.Name = v
 }
 
+// GetGroups returns the Groups field value if set, zero value otherwise.
+func (o *User) GetGroups() string {
+	if o == nil || IsNil(o.Groups) {
+		var ret string
+		return ret
+	}
+	return *o.Groups
+}
+
+// GetGroupsOk returns a tuple with the Groups field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *User) GetGroupsOk() (*string, bool) {
+	if o == nil || IsNil(o.Groups) {
+		return nil, false
+	}
+	return o.Groups, true
+}
+
+// HasGroups returns a boolean if a field has been set.
+func (o *User) HasGroups() bool {
+	if o != nil && !IsNil(o.Groups) {
+		return true
+	}
+
+	return false
+}
+
+// SetGroups gets a reference to the given string and assigns it to the Groups field.
+func (o *User) SetGroups(v string) {
+	o.Groups = &v
+}
+
 func (o User) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -288,6 +321,9 @@ func (o User) ToMap() (map[string]interface{}, error) {
 	}
 	toSerialize["username"] = o.Username
 	toSerialize["name"] = o.Name
+	if !IsNil(o.Groups) {
+		toSerialize["groups"] = o.Groups
+	}
 	return toSerialize, nil
 }
 

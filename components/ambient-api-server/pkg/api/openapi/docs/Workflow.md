@@ -13,6 +13,9 @@ Name | Type | Description | Notes
 **RepoUrl** | Pointer to **string** |  | [optional] 
 **Prompt** | Pointer to **string** |  | [optional] 
 **AgentId** | Pointer to **string** |  | [optional] 
+**ProjectId** | Pointer to **string** |  | [optional] 
+**Branch** | Pointer to **string** |  | [optional] 
+**Path** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
@@ -252,6 +255,81 @@ SetAgentId sets AgentId field to given value.
 `func (o *Workflow) HasAgentId() bool`
 
 HasAgentId returns a boolean if a field has been set.
+
+### GetProjectId
+
+`func (o *Workflow) GetProjectId() string`
+
+GetProjectId returns the ProjectId field if non-nil, zero value otherwise.
+
+### GetProjectIdOk
+
+`func (o *Workflow) GetProjectIdOk() (*string, bool)`
+
+GetProjectIdOk returns a tuple with the ProjectId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetProjectId
+
+`func (o *Workflow) SetProjectId(v string)`
+
+SetProjectId sets ProjectId field to given value.
+
+### HasProjectId
+
+`func (o *Workflow) HasProjectId() bool`
+
+HasProjectId returns a boolean if a field has been set.
+
+### GetBranch
+
+`func (o *Workflow) GetBranch() string`
+
+GetBranch returns the Branch field if non-nil, zero value otherwise.
+
+### GetBranchOk
+
+`func (o *Workflow) GetBranchOk() (*string, bool)`
+
+GetBranchOk returns a tuple with the Branch field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetBranch
+
+`func (o *Workflow) SetBranch(v string)`
+
+SetBranch sets Branch field to given value.
+
+### HasBranch
+
+`func (o *Workflow) HasBranch() bool`
+
+HasBranch returns a boolean if a field has been set.
+
+### GetPath
+
+`func (o *Workflow) GetPath() string`
+
+GetPath returns the Path field if non-nil, zero value otherwise.
+
+### GetPathOk
+
+`func (o *Workflow) GetPathOk() (*string, bool)`
+
+GetPathOk returns a tuple with the Path field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPath
+
+`func (o *Workflow) SetPath(v string)`
+
+SetPath sets Path field to given value.
+
+### HasPath
+
+`func (o *Workflow) HasPath() bool`
+
+HasPath returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

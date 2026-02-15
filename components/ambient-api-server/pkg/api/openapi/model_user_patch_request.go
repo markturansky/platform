@@ -22,6 +22,7 @@ var _ MappedNullable = &UserPatchRequest{}
 type UserPatchRequest struct {
 	Username *string `json:"username,omitempty"`
 	Name     *string `json:"name,omitempty"`
+	Groups   *string `json:"groups,omitempty"`
 }
 
 // NewUserPatchRequest instantiates a new UserPatchRequest object
@@ -105,6 +106,38 @@ func (o *UserPatchRequest) SetName(v string) {
 	o.Name = &v
 }
 
+// GetGroups returns the Groups field value if set, zero value otherwise.
+func (o *UserPatchRequest) GetGroups() string {
+	if o == nil || IsNil(o.Groups) {
+		var ret string
+		return ret
+	}
+	return *o.Groups
+}
+
+// GetGroupsOk returns a tuple with the Groups field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *UserPatchRequest) GetGroupsOk() (*string, bool) {
+	if o == nil || IsNil(o.Groups) {
+		return nil, false
+	}
+	return o.Groups, true
+}
+
+// HasGroups returns a boolean if a field has been set.
+func (o *UserPatchRequest) HasGroups() bool {
+	if o != nil && !IsNil(o.Groups) {
+		return true
+	}
+
+	return false
+}
+
+// SetGroups gets a reference to the given string and assigns it to the Groups field.
+func (o *UserPatchRequest) SetGroups(v string) {
+	o.Groups = &v
+}
+
 func (o UserPatchRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -120,6 +153,9 @@ func (o UserPatchRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Name) {
 		toSerialize["name"] = o.Name
+	}
+	if !IsNil(o.Groups) {
+		toSerialize["groups"] = o.Groups
 	}
 	return toSerialize, nil
 }

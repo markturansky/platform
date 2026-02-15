@@ -78,4 +78,5 @@ func init() {
 
 	db.RegisterMigration(migration())
 	db.RegisterMigration(constraintMigration())
+	db.RegisterMigration(groupsMigration())
 }

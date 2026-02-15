@@ -198,6 +198,12 @@ components:
               type: string
             agent_id:
               type: string
+            project_id:
+              type: string
+            branch:
+              type: string
+            path:
+              type: string
     # NEW SCHEMA START
     WorkflowList:
     # NEW SCHEMA END
@@ -221,6 +227,12 @@ components:
         prompt:
           type: string
         agent_id:
+          type: string
+        project_id:
+          type: string
+        branch:
+          type: string
+        path:
           type: string
   parameters:
       id:

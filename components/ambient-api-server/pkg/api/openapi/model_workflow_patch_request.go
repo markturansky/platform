@@ -20,10 +20,13 @@ var _ MappedNullable = &WorkflowPatchRequest{}
 
 // WorkflowPatchRequest struct for WorkflowPatchRequest
 type WorkflowPatchRequest struct {
-	Name    *string `json:"name,omitempty"`
-	RepoUrl *string `json:"repo_url,omitempty"`
-	Prompt  *string `json:"prompt,omitempty"`
-	AgentId *string `json:"agent_id,omitempty"`
+	Name      *string `json:"name,omitempty"`
+	RepoUrl   *string `json:"repo_url,omitempty"`
+	Prompt    *string `json:"prompt,omitempty"`
+	AgentId   *string `json:"agent_id,omitempty"`
+	ProjectId *string `json:"project_id,omitempty"`
+	Branch    *string `json:"branch,omitempty"`
+	Path      *string `json:"path,omitempty"`
 }
 
 // NewWorkflowPatchRequest instantiates a new WorkflowPatchRequest object
@@ -171,6 +174,102 @@ func (o *WorkflowPatchRequest) SetAgentId(v string) {
 	o.AgentId = &v
 }
 
+// GetProjectId returns the ProjectId field value if set, zero value otherwise.
+func (o *WorkflowPatchRequest) GetProjectId() string {
+	if o == nil || IsNil(o.ProjectId) {
+		var ret string
+		return ret
+	}
+	return *o.ProjectId
+}
+
+// GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowPatchRequest) GetProjectIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ProjectId) {
+		return nil, false
+	}
+	return o.ProjectId, true
+}
+
+// HasProjectId returns a boolean if a field has been set.
+func (o *WorkflowPatchRequest) HasProjectId() bool {
+	if o != nil && !IsNil(o.ProjectId) {
+		return true
+	}
+
+	return false
+}
+
+// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+func (o *WorkflowPatchRequest) SetProjectId(v string) {
+	o.ProjectId = &v
+}
+
+// GetBranch returns the Branch field value if set, zero value otherwise.
+func (o *WorkflowPatchRequest) GetBranch() string {
+	if o == nil || IsNil(o.Branch) {
+		var ret string
+		return ret
+	}
+	return *o.Branch
+}
+
+// GetBranchOk returns a tuple with the Branch field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowPatchRequest) GetBranchOk() (*string, bool) {
+	if o == nil || IsNil(o.Branch) {
+		return nil, false
+	}
+	return o.Branch, true
+}
+
+// HasBranch returns a boolean if a field has been set.
+func (o *WorkflowPatchRequest) HasBranch() bool {
+	if o != nil && !IsNil(o.Branch) {
+		return true
+	}
+
+	return false
+}
+
+// SetBranch gets a reference to the given string and assigns it to the Branch field.
+func (o *WorkflowPatchRequest) SetBranch(v string) {
+	o.Branch = &v
+}
+
+// GetPath returns the Path field value if set, zero value otherwise.
+func (o *WorkflowPatchRequest) GetPath() string {
+	if o == nil || IsNil(o.Path) {
+		var ret string
+		return ret
+	}
+	return *o.Path
+}
+
+// GetPathOk returns a tuple with the Path field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *WorkflowPatchRequest) GetPathOk() (*string, bool) {
+	if o == nil || IsNil(o.Path) {
+		return nil, false
+	}
+	return o.Path, true
+}
+
+// HasPath returns a boolean if a field has been set.
+func (o *WorkflowPatchRequest) HasPath() bool {
+	if o != nil && !IsNil(o.Path) {
+		return true
+	}
+
+	return false
+}
+
+// SetPath gets a reference to the given string and assigns it to the Path field.
+func (o *WorkflowPatchRequest) SetPath(v string) {
+	o.Path = &v
+}
+
 func (o WorkflowPatchRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -192,6 +291,15 @@ func (o WorkflowPatchRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.AgentId) {
 		toSerialize["agent_id"] = o.AgentId
+	}
+	if !IsNil(o.ProjectId) {
+		toSerialize["project_id"] = o.ProjectId
+	}
+	if !IsNil(o.Branch) {
+		toSerialize["branch"] = o.Branch
+	}
+	if !IsNil(o.Path) {
+		toSerialize["path"] = o.Path
 	}
 	return toSerialize, nil
 }

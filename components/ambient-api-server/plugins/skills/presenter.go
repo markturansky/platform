@@ -16,6 +16,7 @@ func ConvertSkill(skill openapi.Skill) *Skill {
 	c.Name = skill.Name
 	c.RepoUrl = skill.RepoUrl
 	c.Prompt = skill.Prompt
+	c.ProjectId = skill.ProjectId
 
 	if skill.CreatedAt != nil {
 		c.CreatedAt = *skill.CreatedAt
@@ -36,5 +37,6 @@ func PresentSkill(skill *Skill) openapi.Skill {
 		Name:      skill.Name,
 		RepoUrl:   skill.RepoUrl,
 		Prompt:    skill.Prompt,
+		ProjectId: skill.ProjectId,
 	}
 }

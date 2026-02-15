@@ -8,6 +8,9 @@ Name | Type | Description | Notes
 **RepoUrl** | Pointer to **string** |  | [optional] 
 **Prompt** | Pointer to **string** |  | [optional] 
 **AgentId** | Pointer to **string** |  | [optional] 
+**ProjectId** | Pointer to **string** |  | [optional] 
+**Branch** | Pointer to **string** |  | [optional] 
+**Path** | Pointer to **string** |  | [optional] 
 
 ## Methods
 
@@ -127,6 +130,81 @@ SetAgentId sets AgentId field to given value.
 `func (o *WorkflowPatchRequest) HasAgentId() bool`
 
 HasAgentId returns a boolean if a field has been set.
+
+### GetProjectId
+
+`func (o *WorkflowPatchRequest) GetProjectId() string`
+
+GetProjectId returns the ProjectId field if non-nil, zero value otherwise.
+
+### GetProjectIdOk
+
+`func (o *WorkflowPatchRequest) GetProjectIdOk() (*string, bool)`
+
+GetProjectIdOk returns a tuple with the ProjectId field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetProjectId
+
+`func (o *WorkflowPatchRequest) SetProjectId(v string)`
+
+SetProjectId sets ProjectId field to given value.
+
+### HasProjectId
+
+`func (o *WorkflowPatchRequest) HasProjectId() bool`
+
+HasProjectId returns a boolean if a field has been set.
+
+### GetBranch
+
+`func (o *WorkflowPatchRequest) GetBranch() string`
+
+GetBranch returns the Branch field if non-nil, zero value otherwise.
+
+### GetBranchOk
+
+`func (o *WorkflowPatchRequest) GetBranchOk() (*string, bool)`
+
+GetBranchOk returns a tuple with the Branch field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetBranch
+
+`func (o *WorkflowPatchRequest) SetBranch(v string)`
+
+SetBranch sets Branch field to given value.
+
+### HasBranch
+
+`func (o *WorkflowPatchRequest) HasBranch() bool`
+
+HasBranch returns a boolean if a field has been set.
+
+### GetPath
+
+`func (o *WorkflowPatchRequest) GetPath() string`
+
+GetPath returns the Path field if non-nil, zero value otherwise.
+
+### GetPathOk
+
+`func (o *WorkflowPatchRequest) GetPathOk() (*string, bool)`
+
+GetPathOk returns a tuple with the Path field if it's non-nil, zero value otherwise
+and a boolean to check if the value has been set.
+
+### SetPath
+
+`func (o *WorkflowPatchRequest) SetPath(v string)`
+
+SetPath sets Path field to given value.
+
+### HasPath
+
+`func (o *WorkflowPatchRequest) HasPath() bool`
+
+HasPath returns a boolean if a field has been set.
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

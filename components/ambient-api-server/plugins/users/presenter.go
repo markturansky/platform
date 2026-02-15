@@ -15,6 +15,7 @@ func ConvertUser(user openapi.User) *User {
 	}
 	c.Username = user.Username
 	c.Name = user.Name
+	c.Groups = user.Groups
 
 	if user.CreatedAt != nil {
 		c.CreatedAt = *user.CreatedAt
@@ -34,5 +35,6 @@ func PresentUser(user *User) openapi.User {
 		UpdatedAt: openapi.PtrTime(user.UpdatedAt),
 		Username:  user.Username,
 		Name:      user.Name,
+		Groups:    user.Groups,
 	}
 }

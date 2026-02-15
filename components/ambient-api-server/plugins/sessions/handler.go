@@ -71,14 +71,50 @@ func (h sessionHandler) Patch(w http.ResponseWriter, r *http.Request) {
 			if patch.Prompt != nil {
 				found.Prompt = patch.Prompt
 			}
-			if patch.CreatedByUserId != nil {
-				found.CreatedByUserId = patch.CreatedByUserId
-			}
 			if patch.AssignedUserId != nil {
 				found.AssignedUserId = patch.AssignedUserId
 			}
 			if patch.WorkflowId != nil {
 				found.WorkflowId = patch.WorkflowId
+			}
+			if patch.Repos != nil {
+				found.Repos = patch.Repos
+			}
+			if patch.Interactive != nil {
+				found.Interactive = patch.Interactive
+			}
+			if patch.Timeout != nil {
+				found.Timeout = patch.Timeout
+			}
+			if patch.LlmModel != nil {
+				found.LlmModel = patch.LlmModel
+			}
+			if patch.LlmTemperature != nil {
+				found.LlmTemperature = patch.LlmTemperature
+			}
+			if patch.LlmMaxTokens != nil {
+				found.LlmMaxTokens = patch.LlmMaxTokens
+			}
+			if patch.ParentSessionId != nil {
+				found.ParentSessionId = patch.ParentSessionId
+			}
+			if patch.BotAccountName != nil {
+				found.BotAccountName = patch.BotAccountName
+			}
+			if patch.ResourceOverrides != nil {
+				found.ResourceOverrides = patch.ResourceOverrides
+			}
+			if patch.EnvironmentVariables != nil {
+				found.EnvironmentVariables = patch.EnvironmentVariables
+			}
+			if patch.Labels != nil {
+				found.SessionLabels = patch.Labels
+			}
+			if patch.Annotations != nil {
+				found.SessionAnnotations = patch.Annotations
+			}
+			if patch.ProjectId != nil {
+				found.ProjectId = patch.ProjectId
 			}
 
 			sessionModel, err := h.session.Replace(ctx, found)
@@ -91,6 +127,61 @@ func (h sessionHandler) Patch(w http.ResponseWriter, r *http.Request) {
 	}
 
 	handlers.Handle(w, r, cfg, http.StatusOK)
+}
+
+func (h sessionHandler) PatchStatus(w http.ResponseWriter, r *http.Request) {
+	var patch SessionStatusPatchRequest
+
+	cfg := &handlers.HandlerConfig{
+		Body:       &patch,
+		Validators: []handlers.Validate{},
+		Action: func() (interface{}, *errors.ServiceError) {
+			ctx := r.Context()
+			id := mux.Vars(r)["id"]
+			sessionModel, err := h.session.UpdateStatus(ctx, id, &patch)
+			if err != nil {
+				return nil, err
+			}
+			return PresentSession(sessionModel), nil
+		},
+		ErrorHandler: handlers.HandleError,
+	}
+
+	handlers.Handle(w, r, cfg, http.StatusOK)
+}
+
+func (h sessionHandler) Start(w http.ResponseWriter, r *http.Request) {
+	cfg := &handlers.HandlerConfig{
+		Action: func() (interface{}, *errors.ServiceError) {
+			ctx := r.Context()
+			id := mux.Vars(r)["id"]
+			sessionModel, err := h.session.Start(ctx, id)
+			if err != nil {
+				return nil, err
+			}
+			return PresentSession(sessionModel), nil
+		},
+		ErrorHandler: handlers.HandleError,
+	}
+
+	handlers.HandleDelete(w, r, cfg, http.StatusOK)
+}
+
+func (h sessionHandler) Stop(w http.ResponseWriter, r *http.Request) {
+	cfg := &handlers.HandlerConfig{
+		Action: func() (interface{}, *errors.ServiceError) {
+			ctx := r.Context()
+			id := mux.Vars(r)["id"]
+			sessionModel, err := h.session.Stop(ctx, id)
+			if err != nil {
+				return nil, err
+			}
+			return PresentSession(sessionModel), nil
+		},
+		ErrorHandler: handlers.HandleError,
+	}
+
+	handlers.HandleDelete(w, r, cfg, http.StatusOK)
 }
 
 func (h sessionHandler) List(w http.ResponseWriter, r *http.Request) {

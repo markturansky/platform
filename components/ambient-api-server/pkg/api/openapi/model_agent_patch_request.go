@@ -20,9 +20,10 @@ var _ MappedNullable = &AgentPatchRequest{}
 
 // AgentPatchRequest struct for AgentPatchRequest
 type AgentPatchRequest struct {
-	Name    *string `json:"name,omitempty"`
-	RepoUrl *string `json:"repo_url,omitempty"`
-	Prompt  *string `json:"prompt,omitempty"`
+	Name      *string `json:"name,omitempty"`
+	RepoUrl   *string `json:"repo_url,omitempty"`
+	Prompt    *string `json:"prompt,omitempty"`
+	ProjectId *string `json:"project_id,omitempty"`
 }
 
 // NewAgentPatchRequest instantiates a new AgentPatchRequest object
@@ -138,6 +139,38 @@ func (o *AgentPatchRequest) SetPrompt(v string) {
 	o.Prompt = &v
 }
 
+// GetProjectId returns the ProjectId field value if set, zero value otherwise.
+func (o *AgentPatchRequest) GetProjectId() string {
+	if o == nil || IsNil(o.ProjectId) {
+		var ret string
+		return ret
+	}
+	return *o.ProjectId
+}
+
+// GetProjectIdOk returns a tuple with the ProjectId field value if set, nil otherwise
+// and a boolean to check if the value has been set.
+func (o *AgentPatchRequest) GetProjectIdOk() (*string, bool) {
+	if o == nil || IsNil(o.ProjectId) {
+		return nil, false
+	}
+	return o.ProjectId, true
+}
+
+// HasProjectId returns a boolean if a field has been set.
+func (o *AgentPatchRequest) HasProjectId() bool {
+	if o != nil && !IsNil(o.ProjectId) {
+		return true
+	}
+
+	return false
+}
+
+// SetProjectId gets a reference to the given string and assigns it to the ProjectId field.
+func (o *AgentPatchRequest) SetProjectId(v string) {
+	o.ProjectId = &v
+}
+
 func (o AgentPatchRequest) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -156,6 +189,9 @@ func (o AgentPatchRequest) ToMap() (map[string]interface{}, error) {
 	}
 	if !IsNil(o.Prompt) {
 		toSerialize["prompt"] = o.Prompt
+	}
+	if !IsNil(o.ProjectId) {
+		toSerialize["project_id"] = o.ProjectId
 	}
 	return toSerialize, nil
 }

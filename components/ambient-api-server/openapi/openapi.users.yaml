@@ -226,6 +226,8 @@ components:
               type: string
             name:
               type: string
+            groups:
+              type: string
             created_at:
               type: string
               format: date-time
@@ -251,6 +253,8 @@ components:
         username:
           type: string
         name:
+          type: string
+        groups:
           type: string
   parameters:
       id:

@@ -7,9 +7,10 @@ import (
 
 type Skill struct {
 	api.Meta
-	Name    string  `json:"name"`
-	RepoUrl *string `json:"repo_url"`
-	Prompt  *string `json:"prompt"`
+	Name      string  `json:"name"`
+	RepoUrl   *string `json:"repo_url"`
+	Prompt    *string `json:"prompt"`
+	ProjectId *string `json:"project_id"`
 }
 
 type SkillList []*Skill
@@ -29,7 +30,8 @@ func (d *Skill) BeforeCreate(tx *gorm.DB) error {
 }
 
 type SkillPatchRequest struct {
-	Name    *string `json:"name,omitempty"`
-	RepoUrl *string `json:"repo_url,omitempty"`
-	Prompt  *string `json:"prompt,omitempty"`
+	Name      *string `json:"name,omitempty"`
+	RepoUrl   *string `json:"repo_url,omitempty"`
+	Prompt    *string `json:"prompt,omitempty"`
+	ProjectId *string `json:"project_id,omitempty"`
 }

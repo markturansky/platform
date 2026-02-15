@@ -71,6 +71,9 @@ func (h taskHandler) Patch(w http.ResponseWriter, r *http.Request) {
 			if patch.Prompt != nil {
 				found.Prompt = patch.Prompt
 			}
+			if patch.ProjectId != nil {
+				found.ProjectId = patch.ProjectId
+			}
 
 			taskModel, err := h.task.Replace(ctx, found)
 			if err != nil {

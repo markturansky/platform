@@ -37,3 +37,34 @@ func constraintMigration() *gormigrate.Migration {
 		},
 	}
 }
+
+func projectIdMigration() *gormigrate.Migration {
+	migrateStatements := []string{
+		`ALTER TABLE skills ADD COLUMN IF NOT EXISTS project_id TEXT`,
+		`CREATE INDEX IF NOT EXISTS idx_skills_project_id ON skills(project_id)`,
+	}
+	rollbackStatements := []string{
+		`DROP INDEX IF EXISTS idx_skills_project_id`,
+		`ALTER TABLE skills DROP COLUMN IF EXISTS project_id`,
+	}
+
+	return &gormigrate.Migration{
+		ID: "202602150031",
+		Migrate: func(tx *gorm.DB) error {
+			for _, stmt := range migrateStatements {
+				if err := tx.Exec(stmt).Error; err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+		Rollback: func(tx *gorm.DB) error {
+			for _, stmt := range rollbackStatements {
+				if err := tx.Exec(stmt).Error; err != nil {
+					return err
+				}
+			}
+			return nil
+		},
+	}
+}

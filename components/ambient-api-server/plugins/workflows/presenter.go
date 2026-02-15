@@ -17,6 +17,9 @@ func ConvertWorkflow(workflow openapi.Workflow) *Workflow {
 	c.RepoUrl = workflow.RepoUrl
 	c.Prompt = workflow.Prompt
 	c.AgentId = workflow.AgentId
+	c.ProjectId = workflow.ProjectId
+	c.Branch = workflow.Branch
+	c.Path = workflow.Path
 
 	if workflow.CreatedAt != nil {
 		c.CreatedAt = *workflow.CreatedAt
@@ -38,5 +41,8 @@ func PresentWorkflow(workflow *Workflow) openapi.Workflow {
 		RepoUrl:   workflow.RepoUrl,
 		Prompt:    workflow.Prompt,
 		AgentId:   workflow.AgentId,
+		ProjectId: workflow.ProjectId,
+		Branch:    workflow.Branch,
+		Path:      workflow.Path,
 	}
 }

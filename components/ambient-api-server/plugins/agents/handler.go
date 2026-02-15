@@ -71,6 +71,9 @@ func (h agentHandler) Patch(w http.ResponseWriter, r *http.Request) {
 			if patch.Prompt != nil {
 				found.Prompt = patch.Prompt
 			}
+			if patch.ProjectId != nil {
+				found.ProjectId = patch.ProjectId
+			}
 
 			agentModel, err := h.agent.Replace(ctx, found)
 			if err != nil {
