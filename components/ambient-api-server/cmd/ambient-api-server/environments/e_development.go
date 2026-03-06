@@ -19,7 +19,6 @@ func (e *DevEnvImpl) OverrideDatabase(c *pkgenv.Database) error {
 
 func (e *DevEnvImpl) OverrideConfig(c *config.ApplicationConfig) error {
 	c.Server.EnableJWT = false
-	c.Server.EnableHTTPS = false
 	c.Server.CORSAllowedHeaders = []string{"X-Ambient-Project"}
 	return nil
 }
@@ -42,7 +41,6 @@ func (e *DevEnvImpl) Flags() map[string]string {
 		"enable-authz":           "false",
 		"debug":                  "false",
 		"enable-mock":            "true",
-		"enable-https":           "false",
 		"enable-metrics-https":   "false",
 		"api-server-hostname":    "localhost",
 		"api-server-bindaddress": "localhost:8000",
