@@ -12,6 +12,7 @@ import (
 	"github.com/ambient-code/platform/components/ambient-cli/cmd/acpctl/get"
 	"github.com/ambient-code/platform/components/ambient-cli/cmd/acpctl/login"
 	"github.com/ambient-code/platform/components/ambient-cli/cmd/acpctl/logout"
+	"github.com/ambient-code/platform/components/ambient-cli/cmd/acpctl/project"
 	"github.com/ambient-code/platform/components/ambient-cli/cmd/acpctl/start"
 	"github.com/ambient-code/platform/components/ambient-cli/cmd/acpctl/stop"
 	"github.com/ambient-code/platform/components/ambient-cli/cmd/acpctl/version"
@@ -35,6 +36,7 @@ func init() {
 	root.AddCommand(version.Cmd)
 	root.AddCommand(whoami.Cmd)
 	root.AddCommand(config.Cmd)
+	root.AddCommand(project.Cmd)
 	root.AddCommand(get.Cmd)
 	root.AddCommand(create.Cmd)
 	root.AddCommand(delete.Cmd)

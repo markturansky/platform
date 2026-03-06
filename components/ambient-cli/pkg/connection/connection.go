@@ -11,8 +11,6 @@ import (
 )
 
 // NewClientFromConfig creates an SDK client from the saved configuration.
-// TODO: Add TLS skip-verify support once the SDK exposes WithHTTPClient option.
-// OpenShift/on-prem deployments with self-signed certs will need this.
 func NewClientFromConfig() (*sdkclient.Client, error) {
 	cfg, err := config.Load()
 	if err != nil {
@@ -35,10 +33,12 @@ func NewClientFromConfig() (*sdkclient.Client, error) {
 		return nil, fmt.Errorf("invalid API URL %q: must include scheme and host (e.g. https://api.example.com)", apiURL)
 	}
 
-	return sdkclient.NewClient(
-		apiURL,
-		token,
-		project,
-		sdkclient.WithUserAgent("acpctl/"+info.Version),
-	)
+	opts := []sdkclient.ClientOption{
+		sdkclient.WithUserAgent("acpctl/" + info.Version),
+	}
+	if cfg.InsecureTLSVerify {
+		opts = append(opts, sdkclient.WithInsecureSkipVerify())
+	}
+
+	return sdkclient.NewClient(apiURL, token, project, opts...)
 }
