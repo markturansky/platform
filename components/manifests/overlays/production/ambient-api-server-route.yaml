@@ -13,8 +13,7 @@ spec:
   port:
     targetPort: api
   tls:
-    termination: edge
-    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
@@ -30,5 +29,4 @@ spec:
   port:
     targetPort: grpc
   tls:
-    termination: edge
-    insecureEdgeTerminationPolicy: Redirect
+    termination: passthrough
