@@ -72,6 +72,10 @@ spec:
             - --enable-https=true
             - --https-cert-file=/etc/tls/tls.crt
             - --https-key-file=/etc/tls/tls.key
+            - --enable-tls=true
+            - --tls-cert-file=/etc/tls/tls.crt
+            - --tls-key-file=/etc/tls/tls.key
+            - --tls-auto-detect-kubernetes=false
             - --api-server-bindaddress=:8000
             - --metrics-server-bindaddress=:4433
             - --health-check-server-bindaddress=:4434

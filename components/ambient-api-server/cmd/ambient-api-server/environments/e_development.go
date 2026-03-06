@@ -18,7 +18,6 @@ func (e *DevEnvImpl) OverrideDatabase(c *pkgenv.Database) error {
 }
 
 func (e *DevEnvImpl) OverrideConfig(c *config.ApplicationConfig) error {
-	c.Server.EnableJWT = false
 	c.Server.CORSAllowedHeaders = []string{"X-Ambient-Project"}
 	return nil
 }
