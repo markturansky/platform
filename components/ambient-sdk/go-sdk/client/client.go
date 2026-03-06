@@ -24,12 +24,13 @@ import (
 )
 
 type Client struct {
-	httpClient *http.Client
-	baseURL    string
-	token      string
-	project    string
-	logger     *slog.Logger
-	userAgent  string
+	httpClient        *http.Client
+	baseURL           string
+	token             string
+	project           string
+	logger            *slog.Logger
+	userAgent         string
+	insecureSkipVerify bool
 }
 
 type ClientOption func(*Client)
@@ -42,6 +43,7 @@ func WithTimeout(timeout time.Duration) ClientOption {
 
 func WithInsecureSkipVerify() ClientOption {
 	return func(c *Client) {
+		c.insecureSkipVerify = true
 		c.httpClient.Transport = &http.Transport{
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
 		}

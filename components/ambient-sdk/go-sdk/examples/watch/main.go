@@ -18,8 +18,7 @@ func main() {
 	fmt.Println()
 
 	// Create client
-	projectName := "sdk-demo"
-	c, err := client.NewClientFromEnv(projectName, client.WithTimeout(120*time.Second))
+	c, err := client.NewClientFromEnv(client.WithTimeout(120 * time.Second))
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}

@@ -10,6 +10,13 @@ import (
 	sdkclient "github.com/ambient-code/platform/components/ambient-sdk/go-sdk/client"
 )
 
+var insecureSkipTLSVerify bool
+
+// SetInsecureSkipTLSVerify overrides TLS verification for the current process.
+func SetInsecureSkipTLSVerify(v bool) {
+	insecureSkipTLSVerify = v
+}
+
 // NewClientFromConfig creates an SDK client from the saved configuration.
 func NewClientFromConfig() (*sdkclient.Client, error) {
 	cfg, err := config.Load()
@@ -36,7 +43,7 @@ func NewClientFromConfig() (*sdkclient.Client, error) {
 	opts := []sdkclient.ClientOption{
 		sdkclient.WithUserAgent("acpctl/" + info.Version),
 	}
-	if cfg.InsecureTLSVerify {
+	if cfg.InsecureTLSVerify || insecureSkipTLSVerify {
 		opts = append(opts, sdkclient.WithInsecureSkipVerify())
 	}
 

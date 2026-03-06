@@ -273,7 +273,11 @@ func (a *SessionAPI) createGRPCConnection() (*grpc.ClientConn, error) {
 
 	var creds credentials.TransportCredentials
 	if strings.HasPrefix(a.client.baseURL, "https://") {
-		creds = credentials.NewTLS(&tls.Config{InsecureSkipVerify: true, MinVersion: tls.VersionTLS12}) //nolint:gosec
+		tlsCfg := &tls.Config{MinVersion: tls.VersionTLS12}
+		if a.client.insecureSkipVerify {
+			tlsCfg.InsecureSkipVerify = true //nolint:gosec
+		}
+		creds = credentials.NewTLS(tlsCfg)
 	} else {
 		creds = insecure.NewCredentials()
 	}

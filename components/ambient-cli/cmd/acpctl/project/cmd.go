@@ -139,7 +139,7 @@ func setProject(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("save config: %w", err)
 	}
 
-	fmt.Printf("Switched to project %q\n", project.Name)
+	fmt.Fprintf(cmd.OutOrStdout(), "Switched to project %q\n", project.Name)
 	return nil
 }
 
@@ -151,16 +151,16 @@ func getCurrentProject(cmd *cobra.Command, args []string) error {
 
 	currentProject := cfg.GetProject()
 	if currentProject == "" {
-		fmt.Println("No project context set")
-		fmt.Println("Use 'acpctl project set <project-name>' to set a project context")
+		fmt.Fprintln(cmd.OutOrStdout(), "No project context set")
+		fmt.Fprintln(cmd.OutOrStdout(), "Use 'acpctl project set <project-name>' to set a project context")
 		return nil
 	}
 
 	// Show where the project setting comes from
 	if env := os.Getenv("AMBIENT_PROJECT"); env != "" {
-		fmt.Printf("Current project: %s (from AMBIENT_PROJECT environment variable)\n", currentProject)
+		fmt.Fprintf(cmd.OutOrStdout(), "Current project: %s (from AMBIENT_PROJECT environment variable)\n", currentProject)
 	} else {
-		fmt.Printf("Current project: %s\n", currentProject)
+		fmt.Fprintf(cmd.OutOrStdout(), "Current project: %s\n", currentProject)
 	}
 	return nil
 }
@@ -186,7 +186,7 @@ func listProjects(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(list.Items) == 0 {
-		fmt.Println("No projects found")
+		fmt.Fprintln(cmd.OutOrStdout(), "No projects found")
 		return nil
 	}
 
@@ -227,11 +227,7 @@ func isNotFoundError(err error) bool {
 		return apiErr.StatusCode == 404
 	}
 
-	// Fallback to string matching for non-API errors
-	errStr := err.Error()
-	return strings.Contains(errStr, "404") ||
-		strings.Contains(errStr, "not found") ||
-		strings.Contains(errStr, "Not Found")
+	return false
 }
 
 // validateProjectName validates project name against Kubernetes DNS label requirements
