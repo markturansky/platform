@@ -5,393 +5,127 @@ import (
 	"testing"
 
 	"github.com/rs/zerolog"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	dynamicfake "k8s.io/client-go/dynamic/fake"
+	k8stesting "k8s.io/client-go/testing"
 )
 
-func newFakeKubeClient(_ string, objects ...runtime.Object) *KubeClient {
+func newScheme() *runtime.Scheme {
 	scheme := runtime.NewScheme()
-	scheme.AddKnownTypeWithName(
-		schema.GroupVersionKind{Group: "vteam.ambient-code", Version: "v1alpha1", Kind: "AgenticSession"},
-		&unstructured.Unstructured{},
-	)
-	scheme.AddKnownTypeWithName(
-		schema.GroupVersionKind{Group: "vteam.ambient-code", Version: "v1alpha1", Kind: "AgenticSessionList"},
-		&unstructured.UnstructuredList{},
-	)
+	for _, gvk := range []schema.GroupVersionKind{
+		{Group: "", Version: "v1", Kind: "Namespace"},
+		{Group: "", Version: "v1", Kind: "Pod"},
+		{Group: "", Version: "v1", Kind: "Service"},
+		{Group: "", Version: "v1", Kind: "Secret"},
+		{Group: "", Version: "v1", Kind: "ServiceAccount"},
+		{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "RoleBinding"},
+		{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "Role"},
+	} {
+		scheme.AddKnownTypeWithName(gvk, &unstructured.Unstructured{})
+		listGVK := gvk
+		listGVK.Kind += "List"
+		scheme.AddKnownTypeWithName(listGVK, &unstructured.UnstructuredList{})
+	}
+	return scheme
+}
 
-	fakeClient := dynamicfake.NewSimpleDynamicClient(scheme, objects...)
-
+func newFakeKubeClientFull(objects ...runtime.Object) *KubeClient {
+	fakeClient := dynamicfake.NewSimpleDynamicClient(newScheme(), objects...)
 	return &KubeClient{
 		dynamic: fakeClient,
 		logger:  zerolog.Nop(),
 	}
 }
 
-func buildAgenticSession(namespace, name string) *unstructured.Unstructured {
+func newFakeClientWithTracker(objects ...runtime.Object) (*dynamicfake.FakeDynamicClient, *KubeClient) {
+	fakeClient := dynamicfake.NewSimpleDynamicClient(newScheme(), objects...)
+	kc := &KubeClient{dynamic: fakeClient, logger: zerolog.Nop()}
+	return fakeClient, kc
+}
+
+func buildPod(namespace, name string) *unstructured.Unstructured {
 	return &unstructured.Unstructured{
 		Object: map[string]interface{}{
-			"apiVersion": "vteam.ambient-code/v1alpha1",
-			"kind":       "AgenticSession",
+			"apiVersion": "v1",
+			"kind":       "Pod",
 			"metadata": map[string]interface{}{
 				"name":      name,
 				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
-				"displayName":   name,
-				"initialPrompt": "test prompt",
+				"containers": []interface{}{
+					map[string]interface{}{"name": "runner", "image": "ambient-runner:latest"},
+				},
 			},
 		},
 	}
 }
 
-func TestGetAgenticSession_Found(t *testing.T) {
-	ns := "test-ns"
-	session := buildAgenticSession(ns, "my-session")
-	kc := newFakeKubeClient(ns, session)
-
-	cr, err := kc.GetAgenticSession(context.Background(), ns, "my-session")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if cr.GetName() != "my-session" {
-		t.Errorf("expected name 'my-session', got %q", cr.GetName())
-	}
-}
-
-func TestGetAgenticSession_NotFound(t *testing.T) {
-	kc := newFakeKubeClient("test-ns")
-
-	_, err := kc.GetAgenticSession(context.Background(), "test-ns", "nonexistent")
-	if err == nil {
-		t.Fatal("expected error for nonexistent session, got nil")
-	}
-}
-
-func TestListAgenticSessions(t *testing.T) {
-	ns := "test-ns"
-	s1 := buildAgenticSession(ns, "session-1")
-	s2 := buildAgenticSession(ns, "session-2")
-	s3 := buildAgenticSession(ns, "session-3")
-	kc := newFakeKubeClient(ns, s1, s2, s3)
-
-	list, err := kc.ListAgenticSessions(context.Background(), ns)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(list.Items) != 3 {
-		t.Errorf("expected 3 items, got %d", len(list.Items))
-	}
-
-	names := map[string]bool{}
-	for _, item := range list.Items {
-		names[item.GetName()] = true
-	}
-	for _, expected := range []string{"session-1", "session-2", "session-3"} {
-		if !names[expected] {
-			t.Errorf("expected session %q in list", expected)
-		}
-	}
-}
-
-func TestGetAgenticSession_WrongNamespace(t *testing.T) {
-	session := buildAgenticSession("other-ns", "my-session")
-	kc := newFakeKubeClient("test-ns", session)
-
-	_, err := kc.GetAgenticSession(context.Background(), "test-ns", "my-session")
-	if err == nil {
-		t.Fatal("expected error when session is in a different namespace")
-	}
-}
-
-func TestListAgenticSessions_Empty(t *testing.T) {
-	kc := newFakeKubeClient("test-ns")
-
-	list, err := kc.ListAgenticSessions(context.Background(), "test-ns")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if len(list.Items) != 0 {
-		t.Errorf("expected 0 items, got %d", len(list.Items))
-	}
-}
-
-func TestAgenticSessionGVR(t *testing.T) {
-	if AgenticSessionGVR.Group != "vteam.ambient-code" {
-		t.Errorf("expected group 'vteam.ambient-code', got %q", AgenticSessionGVR.Group)
-	}
-	if AgenticSessionGVR.Version != "v1alpha1" {
-		t.Errorf("expected version 'v1alpha1', got %q", AgenticSessionGVR.Version)
-	}
-	if AgenticSessionGVR.Resource != "agenticsessions" {
-		t.Errorf("expected resource 'agenticsessions', got %q", AgenticSessionGVR.Resource)
-	}
-}
-
-func TestGetAgenticSession_VerifiesSpec(t *testing.T) {
-	ns := "test-ns"
-	session := buildAgenticSession(ns, "detailed-session")
-	kc := newFakeKubeClient(ns, session)
-
-	cr, err := kc.GetAgenticSession(context.Background(), ns, "detailed-session")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	displayName, found, err := unstructured.NestedString(cr.Object, "spec", "displayName")
-	if err != nil || !found {
-		t.Fatal("expected spec.displayName to exist")
-	}
-	if displayName != "detailed-session" {
-		t.Errorf("expected displayName 'detailed-session', got %q", displayName)
-	}
-
-	prompt, found, err := unstructured.NestedString(cr.Object, "spec", "initialPrompt")
-	if err != nil || !found {
-		t.Fatal("expected spec.initialPrompt to exist")
-	}
-	if prompt != "test prompt" {
-		t.Errorf("expected initialPrompt 'test prompt', got %q", prompt)
-	}
-}
-
-func TestListAgenticSessions_NamespaceIsolation(t *testing.T) {
-	s1 := buildAgenticSession("ns-a", "session-in-a")
-	s2 := buildAgenticSession("ns-b", "session-in-b")
-
-	fakeClient := dynamicfake.NewSimpleDynamicClient(runtime.NewScheme(), s1, s2)
-	kc := &KubeClient{
-		dynamic: fakeClient,
-		logger:  zerolog.Nop(),
-	}
-
-	list, err := kc.ListAgenticSessions(context.Background(), "ns-a")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	for _, item := range list.Items {
-		if item.GetNamespace() != "ns-a" {
-			t.Errorf("expected only ns-a items, got namespace %q for %q", item.GetNamespace(), item.GetName())
-		}
-	}
-}
-
-func TestGetAgenticSession_ReturnsFullObject(t *testing.T) {
-	ns := "test-ns"
-	session := buildAgenticSession(ns, "full-session")
-
-	spec := session.Object["spec"].(map[string]interface{})
-	spec["interactive"] = true
-	spec["timeout"] = int64(3600)
-
-	kc := newFakeKubeClient(ns, session)
-
-	cr, err := kc.GetAgenticSession(context.Background(), ns, "full-session")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-
-	interactive, found, _ := unstructured.NestedBool(cr.Object, "spec", "interactive")
-	if !found || !interactive {
-		t.Error("expected spec.interactive to be true")
-	}
-
-	labels := cr.GetLabels()
-	_ = labels
-
-	gvk := cr.GroupVersionKind()
-	if gvk.Kind != "AgenticSession" {
-		t.Errorf("expected kind 'AgenticSession', got %q", gvk.Kind)
-	}
-}
-
-func TestListAgenticSessions_ChecksGVR(t *testing.T) {
-	ns := "test-ns"
-	kc := newFakeKubeClient(ns)
-
-	_, err := kc.dynamic.Resource(AgenticSessionGVR).Namespace(ns).List(
-		context.Background(),
-		metav1.ListOptions{},
-	)
-	if err != nil {
-		t.Fatalf("listing via GVR should not error on empty: %v", err)
-	}
-}
-
-func TestCreateAgenticSession(t *testing.T) {
-	ns := "test-ns"
-	kc := newFakeKubeClient(ns)
-
-	session := buildAgenticSession(ns, "new-session")
-	created, err := kc.CreateAgenticSession(context.Background(), ns, session)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
-	if created.GetName() != "new-session" {
-		t.Errorf("expected name 'new-session', got %q", created.GetName())
-	}
-
-	got, err := kc.GetAgenticSession(context.Background(), ns, "new-session")
-	if err != nil {
-		t.Fatalf("get after create failed: %v", err)
-	}
-	if got.GetName() != "new-session" {
-		t.Errorf("round-trip name mismatch: %q", got.GetName())
-	}
-}
-
-func TestUpdateAgenticSession(t *testing.T) {
-	ns := "test-ns"
-	session := buildAgenticSession(ns, "update-me")
-	kc := newFakeKubeClient(ns, session)
-
-	existing, err := kc.GetAgenticSession(context.Background(), ns, "update-me")
-	if err != nil {
-		t.Fatalf("get failed: %v", err)
-	}
-
-	_ = unstructured.SetNestedField(existing.Object, "updated prompt", "spec", "initialPrompt")
-	updated, err := kc.UpdateAgenticSession(context.Background(), existing)
-	if err != nil {
-		t.Fatalf("update failed: %v", err)
-	}
-
-	prompt, _, _ := unstructured.NestedString(updated.Object, "spec", "initialPrompt")
-	if prompt != "updated prompt" {
-		t.Errorf("expected updated prompt, got %q", prompt)
-	}
-
-	reread, err := kc.GetAgenticSession(context.Background(), ns, "update-me")
-	if err != nil {
-		t.Fatalf("re-read failed: %v", err)
-	}
-	prompt2, _, _ := unstructured.NestedString(reread.Object, "spec", "initialPrompt")
-	if prompt2 != "updated prompt" {
-		t.Errorf("re-read prompt mismatch: %q", prompt2)
-	}
-}
-
-func TestDeleteAgenticSession(t *testing.T) {
-	ns := "test-ns"
-	session := buildAgenticSession(ns, "delete-me")
-	kc := newFakeKubeClient(ns, session)
-
-	_, err := kc.GetAgenticSession(context.Background(), ns, "delete-me")
-	if err != nil {
-		t.Fatalf("session should exist before delete: %v", err)
-	}
-
-	err = kc.DeleteAgenticSession(context.Background(), ns, "delete-me")
-	if err != nil {
-		t.Fatalf("delete failed: %v", err)
-	}
-
-	_, err = kc.GetAgenticSession(context.Background(), ns, "delete-me")
-	if err == nil {
-		t.Fatal("expected error after delete, got nil")
-	}
-}
-
-func TestDeleteAgenticSession_NotFound(t *testing.T) {
-	ns := "test-ns"
-	kc := newFakeKubeClient(ns)
-
-	err := kc.DeleteAgenticSession(context.Background(), ns, "nonexistent")
-	if err == nil {
-		t.Fatal("expected error deleting nonexistent session")
-	}
-}
-
-func TestCreateAgenticSession_RoundTripsSpec(t *testing.T) {
-	ns := "test-ns"
-	kc := newFakeKubeClient(ns)
-
-	session := &unstructured.Unstructured{
+func buildService(namespace, name string) *unstructured.Unstructured {
+	return &unstructured.Unstructured{
 		Object: map[string]interface{}{
-			"apiVersion": "vteam.ambient-code/v1alpha1",
-			"kind":       "AgenticSession",
+			"apiVersion": "v1",
+			"kind":       "Service",
 			"metadata": map[string]interface{}{
-				"name":      "full-spec-session",
-				"namespace": ns,
+				"name":      name,
+				"namespace": namespace,
 			},
 			"spec": map[string]interface{}{
-				"displayName":   "Full Spec Test",
-				"initialPrompt": "build something",
-				"interactive":   true,
-				"timeout":       int64(600),
-				"project":       "my-project",
-				"llmSettings": map[string]interface{}{
-					"model":       "claude-3-7-sonnet",
-					"temperature": float64(0.5),
-					"maxTokens":   int64(8000),
-				},
-				"botAccount": map[string]interface{}{
-					"name": "bot-1",
-				},
+				"selector": map[string]interface{}{"app": name},
+				"ports":    []interface{}{map[string]interface{}{"port": int64(8080)}},
 			},
 		},
 	}
+}
 
-	_, err := kc.CreateAgenticSession(context.Background(), ns, session)
-	if err != nil {
-		t.Fatalf("create failed: %v", err)
-	}
-
-	got, err := kc.GetAgenticSession(context.Background(), ns, "full-spec-session")
-	if err != nil {
-		t.Fatalf("get failed: %v", err)
-	}
-
-	model, _, _ := unstructured.NestedString(got.Object, "spec", "llmSettings", "model")
-	if model != "claude-3-7-sonnet" {
-		t.Errorf("expected model 'claude-3-7-sonnet', got %q", model)
-	}
-
-	botName, _, _ := unstructured.NestedString(got.Object, "spec", "botAccount", "name")
-	if botName != "bot-1" {
-		t.Errorf("expected bot name 'bot-1', got %q", botName)
-	}
-
-	project, _, _ := unstructured.NestedString(got.Object, "spec", "project")
-	if project != "my-project" {
-		t.Errorf("expected project 'my-project', got %q", project)
+func buildSecret(namespace, name string) *unstructured.Unstructured {
+	return &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": "v1",
+			"kind":       "Secret",
+			"metadata": map[string]interface{}{
+				"name":      name,
+				"namespace": namespace,
+			},
+			"data": map[string]interface{}{
+				"token": "dGVzdA==",
+			},
+		},
 	}
 }
 
-func newFakeKubeClientWithNamespaces(_ string, objects ...runtime.Object) *KubeClient {
-	scheme := runtime.NewScheme()
-	scheme.AddKnownTypeWithName(
-		schema.GroupVersionKind{Group: "vteam.ambient-code", Version: "v1alpha1", Kind: "AgenticSession"},
-		&unstructured.Unstructured{},
-	)
-	scheme.AddKnownTypeWithName(
-		schema.GroupVersionKind{Group: "vteam.ambient-code", Version: "v1alpha1", Kind: "AgenticSessionList"},
-		&unstructured.UnstructuredList{},
-	)
-	scheme.AddKnownTypeWithName(
-		schema.GroupVersionKind{Group: "", Version: "v1", Kind: "Namespace"},
-		&unstructured.Unstructured{},
-	)
-	scheme.AddKnownTypeWithName(
-		schema.GroupVersionKind{Group: "", Version: "v1", Kind: "NamespaceList"},
-		&unstructured.UnstructuredList{},
-	)
-	scheme.AddKnownTypeWithName(
-		schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "RoleBinding"},
-		&unstructured.Unstructured{},
-	)
-	scheme.AddKnownTypeWithName(
-		schema.GroupVersionKind{Group: "rbac.authorization.k8s.io", Version: "v1", Kind: "RoleBindingList"},
-		&unstructured.UnstructuredList{},
-	)
-	fakeClient := dynamicfake.NewSimpleDynamicClient(scheme, objects...)
-	return &KubeClient{
-		dynamic: fakeClient,
-		logger:  zerolog.Nop(),
+func buildServiceAccount(namespace, name string) *unstructured.Unstructured {
+	return &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": "v1",
+			"kind":       "ServiceAccount",
+			"metadata": map[string]interface{}{
+				"name":      name,
+				"namespace": namespace,
+			},
+		},
+	}
+}
+
+func buildRole(namespace, name string) *unstructured.Unstructured {
+	return &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": "rbac.authorization.k8s.io/v1",
+			"kind":       "Role",
+			"metadata": map[string]interface{}{
+				"name":      name,
+				"namespace": namespace,
+			},
+			"rules": []interface{}{
+				map[string]interface{}{
+					"apiGroups": []interface{}{""},
+					"resources": []interface{}{"pods"},
+					"verbs":     []interface{}{"get", "list"},
+				},
+			},
+		},
 	}
 }
 
@@ -434,7 +168,7 @@ func buildRoleBinding(namespace, name string) *unstructured.Unstructured {
 
 func TestGetNamespace_Found(t *testing.T) {
 	ns := buildNamespace("my-project")
-	kc := newFakeKubeClientWithNamespaces("default", ns)
+	kc := newFakeKubeClientFull(ns)
 
 	got, err := kc.GetNamespace(context.Background(), "my-project")
 	if err != nil {
@@ -446,7 +180,7 @@ func TestGetNamespace_Found(t *testing.T) {
 }
 
 func TestGetNamespace_NotFound(t *testing.T) {
-	kc := newFakeKubeClientWithNamespaces("default")
+	kc := newFakeKubeClientFull()
 
 	_, err := kc.GetNamespace(context.Background(), "nonexistent")
 	if err == nil {
@@ -455,7 +189,7 @@ func TestGetNamespace_NotFound(t *testing.T) {
 }
 
 func TestCreateNamespace(t *testing.T) {
-	kc := newFakeKubeClientWithNamespaces("default")
+	kc := newFakeKubeClientFull()
 	ns := buildNamespace("new-project")
 
 	created, err := kc.CreateNamespace(context.Background(), ns)
@@ -477,7 +211,7 @@ func TestCreateNamespace(t *testing.T) {
 
 func TestUpdateNamespace_Labels(t *testing.T) {
 	ns := buildNamespace("label-test")
-	kc := newFakeKubeClientWithNamespaces("default", ns)
+	kc := newFakeKubeClientFull(ns)
 
 	existing, _ := kc.GetNamespace(context.Background(), "label-test")
 	existing.SetLabels(map[string]string{
@@ -524,7 +258,7 @@ func TestRoleBindingGVR(t *testing.T) {
 }
 
 func TestCreateRoleBinding(t *testing.T) {
-	kc := newFakeKubeClientWithNamespaces("default")
+	kc := newFakeKubeClientFull()
 	rb := buildRoleBinding("my-project", "ambient-devs-edit")
 
 	created, err := kc.CreateRoleBinding(context.Background(), "my-project", rb)
@@ -538,7 +272,7 @@ func TestCreateRoleBinding(t *testing.T) {
 
 func TestGetRoleBinding(t *testing.T) {
 	rb := buildRoleBinding("my-project", "ambient-devs-edit")
-	kc := newFakeKubeClientWithNamespaces("default", rb)
+	kc := newFakeKubeClientFull(rb)
 
 	got, err := kc.GetRoleBinding(context.Background(), "my-project", "ambient-devs-edit")
 	if err != nil {
@@ -550,7 +284,7 @@ func TestGetRoleBinding(t *testing.T) {
 }
 
 func TestGetRoleBinding_NotFound(t *testing.T) {
-	kc := newFakeKubeClientWithNamespaces("default")
+	kc := newFakeKubeClientFull()
 
 	_, err := kc.GetRoleBinding(context.Background(), "my-project", "nonexistent")
 	if err == nil {
@@ -560,7 +294,7 @@ func TestGetRoleBinding_NotFound(t *testing.T) {
 
 func TestUpdateRoleBinding(t *testing.T) {
 	rb := buildRoleBinding("my-project", "ambient-devs-edit")
-	kc := newFakeKubeClientWithNamespaces("default", rb)
+	kc := newFakeKubeClientFull(rb)
 
 	existing, _ := kc.GetRoleBinding(context.Background(), "my-project", "ambient-devs-edit")
 	_ = unstructured.SetNestedField(existing.Object, "admin", "roleRef", "name")
@@ -578,7 +312,7 @@ func TestUpdateRoleBinding(t *testing.T) {
 
 func TestDeleteRoleBinding(t *testing.T) {
 	rb := buildRoleBinding("my-project", "ambient-devs-edit")
-	kc := newFakeKubeClientWithNamespaces("default", rb)
+	kc := newFakeKubeClientFull(rb)
 
 	err := kc.DeleteRoleBinding(context.Background(), "my-project", "ambient-devs-edit")
 	if err != nil {
@@ -592,10 +326,233 @@ func TestDeleteRoleBinding(t *testing.T) {
 }
 
 func TestDeleteRoleBinding_NotFound(t *testing.T) {
-	kc := newFakeKubeClientWithNamespaces("default")
+	kc := newFakeKubeClientFull()
 
 	err := kc.DeleteRoleBinding(context.Background(), "my-project", "nonexistent")
 	if err == nil {
 		t.Fatal("expected error deleting nonexistent rolebinding")
 	}
+}
+
+func TestCreateAndGetPod(t *testing.T) {
+	kc := newFakeKubeClientFull()
+	pod := buildPod("my-project", "runner-pod")
+
+	created, err := kc.CreatePod(context.Background(), pod)
+	if err != nil {
+		t.Fatalf("create pod failed: %v", err)
+	}
+	if created.GetName() != "runner-pod" {
+		t.Errorf("expected name 'runner-pod', got %q", created.GetName())
+	}
+
+	got, err := kc.GetPod(context.Background(), "my-project", "runner-pod")
+	if err != nil {
+		t.Fatalf("get pod failed: %v", err)
+	}
+	if got.GetNamespace() != "my-project" {
+		t.Errorf("expected namespace 'my-project', got %q", got.GetNamespace())
+	}
+}
+
+func TestDeletePod(t *testing.T) {
+	pod := buildPod("my-project", "runner-pod")
+	kc := newFakeKubeClientFull(pod)
+
+	err := kc.DeletePod(context.Background(), "my-project", "runner-pod", nil)
+	if err != nil {
+		t.Fatalf("delete pod failed: %v", err)
+	}
+
+	_, err = kc.GetPod(context.Background(), "my-project", "runner-pod")
+	if err == nil {
+		t.Fatal("expected error after delete")
+	}
+}
+
+func TestCreateAndGetService(t *testing.T) {
+	kc := newFakeKubeClientFull()
+	svc := buildService("my-project", "runner-svc")
+
+	created, err := kc.CreateService(context.Background(), svc)
+	if err != nil {
+		t.Fatalf("create service failed: %v", err)
+	}
+	if created.GetName() != "runner-svc" {
+		t.Errorf("expected name 'runner-svc', got %q", created.GetName())
+	}
+
+	got, err := kc.GetService(context.Background(), "my-project", "runner-svc")
+	if err != nil {
+		t.Fatalf("get service failed: %v", err)
+	}
+	if got.GetName() != "runner-svc" {
+		t.Errorf("round-trip name mismatch: %q", got.GetName())
+	}
+}
+
+func TestCreateAndGetSecret(t *testing.T) {
+	kc := newFakeKubeClientFull()
+	secret := buildSecret("my-project", "runner-token")
+
+	created, err := kc.CreateSecret(context.Background(), secret)
+	if err != nil {
+		t.Fatalf("create secret failed: %v", err)
+	}
+	if created.GetName() != "runner-token" {
+		t.Errorf("expected name 'runner-token', got %q", created.GetName())
+	}
+
+	got, err := kc.GetSecret(context.Background(), "my-project", "runner-token")
+	if err != nil {
+		t.Fatalf("get secret failed: %v", err)
+	}
+	if got.GetName() != "runner-token" {
+		t.Errorf("round-trip name mismatch: %q", got.GetName())
+	}
+}
+
+func TestCreateAndGetServiceAccount(t *testing.T) {
+	kc := newFakeKubeClientFull()
+	sa := buildServiceAccount("my-project", "runner-sa")
+
+	created, err := kc.CreateServiceAccount(context.Background(), sa)
+	if err != nil {
+		t.Fatalf("create serviceaccount failed: %v", err)
+	}
+	if created.GetName() != "runner-sa" {
+		t.Errorf("expected name 'runner-sa', got %q", created.GetName())
+	}
+
+	got, err := kc.GetServiceAccount(context.Background(), "my-project", "runner-sa")
+	if err != nil {
+		t.Fatalf("get serviceaccount failed: %v", err)
+	}
+	if got.GetName() != "runner-sa" {
+		t.Errorf("round-trip name mismatch: %q", got.GetName())
+	}
+}
+
+func TestCreateAndGetRole(t *testing.T) {
+	kc := newFakeKubeClientFull()
+	role := buildRole("my-project", "runner-role")
+
+	created, err := kc.CreateRole(context.Background(), role)
+	if err != nil {
+		t.Fatalf("create role failed: %v", err)
+	}
+	if created.GetName() != "runner-role" {
+		t.Errorf("expected name 'runner-role', got %q", created.GetName())
+	}
+
+	got, err := kc.GetRole(context.Background(), "my-project", "runner-role")
+	if err != nil {
+		t.Fatalf("get role failed: %v", err)
+	}
+	if got.GetName() != "runner-role" {
+		t.Errorf("round-trip name mismatch: %q", got.GetName())
+	}
+}
+
+func TestGVRConstants(t *testing.T) {
+	cases := []struct {
+		name     string
+		gvr      schema.GroupVersionResource
+		group    string
+		version  string
+		resource string
+	}{
+		{"Namespace", NamespaceGVR, "", "v1", "namespaces"},
+		{"Pod", PodGVR, "", "v1", "pods"},
+		{"Service", ServiceGVR, "", "v1", "services"},
+		{"Secret", SecretGVR, "", "v1", "secrets"},
+		{"ServiceAccount", ServiceAccountGVR, "", "v1", "serviceaccounts"},
+		{"RoleBinding", RoleBindingGVR, "rbac.authorization.k8s.io", "v1", "rolebindings"},
+		{"Role", RoleGVR, "rbac.authorization.k8s.io", "v1", "roles"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.gvr.Group != tc.group {
+				t.Errorf("group: expected %q got %q", tc.group, tc.gvr.Group)
+			}
+			if tc.gvr.Version != tc.version {
+				t.Errorf("version: expected %q got %q", tc.version, tc.gvr.Version)
+			}
+			if tc.gvr.Resource != tc.resource {
+				t.Errorf("resource: expected %q got %q", tc.resource, tc.gvr.Resource)
+			}
+		})
+	}
+}
+
+func assertDeleteCollectionAction(t *testing.T, fake *dynamicfake.FakeDynamicClient, wantResource, wantNamespace, wantSelector string) {
+	// wantSelector must be a simple "key=value" expression; set-based selectors
+	// may not round-trip correctly through Labels.String().
+	t.Helper()
+	actions := fake.Actions()
+	if len(actions) == 0 {
+		t.Fatal("expected a delete-collection action, got none")
+	}
+	last := actions[len(actions)-1]
+	dc, ok := last.(k8stesting.DeleteCollectionAction)
+	if !ok {
+		t.Fatalf("expected DeleteCollectionAction, got %T", last)
+	}
+	if dc.GetResource().Resource != wantResource {
+		t.Errorf("resource: expected %q got %q", wantResource, dc.GetResource().Resource)
+	}
+	if dc.GetNamespace() != wantNamespace {
+		t.Errorf("namespace: expected %q got %q", wantNamespace, dc.GetNamespace())
+	}
+	if got := dc.GetListRestrictions().Labels.String(); got != wantSelector {
+		t.Errorf("label selector: expected %q got %q", wantSelector, got)
+	}
+}
+
+func TestDeletePodsByLabel(t *testing.T) {
+	fake, kc := newFakeClientWithTracker(buildPod("ns", "pod-1"))
+	if err := kc.DeletePodsByLabel(context.Background(), "ns", "app=runner"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertDeleteCollectionAction(t, fake, "pods", "ns", "app=runner")
+}
+
+func TestDeleteServicesByLabel(t *testing.T) {
+	fake, kc := newFakeClientWithTracker(buildService("ns", "svc-1"))
+	if err := kc.DeleteServicesByLabel(context.Background(), "ns", "app=runner"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertDeleteCollectionAction(t, fake, "services", "ns", "app=runner")
+}
+
+func TestDeleteSecretsByLabel(t *testing.T) {
+	fake, kc := newFakeClientWithTracker(buildSecret("ns", "secret-1"))
+	if err := kc.DeleteSecretsByLabel(context.Background(), "ns", "app=runner"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertDeleteCollectionAction(t, fake, "secrets", "ns", "app=runner")
+}
+
+func TestDeleteServiceAccountsByLabel(t *testing.T) {
+	fake, kc := newFakeClientWithTracker(buildServiceAccount("ns", "sa-1"))
+	if err := kc.DeleteServiceAccountsByLabel(context.Background(), "ns", "app=runner"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertDeleteCollectionAction(t, fake, "serviceaccounts", "ns", "app=runner")
+}
+
+func TestDeleteRolesByLabel(t *testing.T) {
+	fake, kc := newFakeClientWithTracker(buildRole("ns", "role-1"))
+	if err := kc.DeleteRolesByLabel(context.Background(), "ns", "app=runner"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertDeleteCollectionAction(t, fake, "roles", "ns", "app=runner")
+}
+
+func TestDeleteRoleBindingsByLabel(t *testing.T) {
+	fake, kc := newFakeClientWithTracker(buildRoleBinding("ns", "rb-1"))
+	if err := kc.DeleteRoleBindingsByLabel(context.Background(), "ns", "app=runner"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	assertDeleteCollectionAction(t, fake, "rolebindings", "ns", "app=runner")
 }
