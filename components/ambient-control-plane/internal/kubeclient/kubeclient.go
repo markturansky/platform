@@ -9,17 +9,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
-	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
-
-var AgenticSessionGVR = schema.GroupVersionResource{
-	Group:    "vteam.ambient-code",
-	Version:  "v1alpha1",
-	Resource: "agenticsessions",
-}
 
 var NamespaceGVR = schema.GroupVersionResource{
 	Group:    "",
@@ -31,6 +24,36 @@ var RoleBindingGVR = schema.GroupVersionResource{
 	Group:    "rbac.authorization.k8s.io",
 	Version:  "v1",
 	Resource: "rolebindings",
+}
+
+var PodGVR = schema.GroupVersionResource{
+	Group:    "",
+	Version:  "v1",
+	Resource: "pods",
+}
+
+var ServiceGVR = schema.GroupVersionResource{
+	Group:    "",
+	Version:  "v1",
+	Resource: "services",
+}
+
+var SecretGVR = schema.GroupVersionResource{
+	Group:    "",
+	Version:  "v1",
+	Resource: "secrets",
+}
+
+var ServiceAccountGVR = schema.GroupVersionResource{
+	Group:    "",
+	Version:  "v1",
+	Resource: "serviceaccounts",
+}
+
+var RoleGVR = schema.GroupVersionResource{
+	Group:    "rbac.authorization.k8s.io",
+	Version:  "v1",
+	Resource: "roles",
 }
 
 type KubeClient struct {
@@ -83,26 +106,6 @@ func NewFromDynamic(dynClient dynamic.Interface, logger zerolog.Logger) *KubeCli
 	}
 }
 
-func (kc *KubeClient) GetAgenticSession(ctx context.Context, namespace, name string) (*unstructured.Unstructured, error) {
-	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
-}
-
-func (kc *KubeClient) ListAgenticSessions(ctx context.Context, namespace string) (*unstructured.UnstructuredList, error) {
-	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(namespace).List(ctx, metav1.ListOptions{})
-}
-
-func (kc *KubeClient) CreateAgenticSession(ctx context.Context, namespace string, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
-	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(namespace).Create(ctx, obj, metav1.CreateOptions{})
-}
-
-func (kc *KubeClient) UpdateAgenticSession(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
-	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(obj.GetNamespace()).Update(ctx, obj, metav1.UpdateOptions{})
-}
-
-func (kc *KubeClient) DeleteAgenticSession(ctx context.Context, namespace, name string) error {
-	return kc.dynamic.Resource(AgenticSessionGVR).Namespace(namespace).Delete(ctx, name, metav1.DeleteOptions{})
-}
-
 func (kc *KubeClient) GetNamespace(ctx context.Context, name string) (*unstructured.Unstructured, error) {
 	return kc.dynamic.Resource(NamespaceGVR).Get(ctx, name, metav1.GetOptions{})
 }
@@ -139,16 +142,78 @@ func (kc *KubeClient) ListRoleBindings(ctx context.Context, namespace string, la
 	return kc.dynamic.Resource(RoleBindingGVR).Namespace(namespace).List(ctx, opts)
 }
 
-// WatchAgenticSessions creates a watch for AgenticSession resources across all namespaces
-func (kc *KubeClient) WatchAgenticSessions(ctx context.Context, resourceVersion string) (watch.Interface, error) {
-	opts := metav1.ListOptions{
-		Watch:           true,
-		ResourceVersion: resourceVersion,
-	}
-	return kc.dynamic.Resource(AgenticSessionGVR).Watch(ctx, opts)
+// Pod operations
+func (kc *KubeClient) GetPod(ctx context.Context, namespace, name string) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(PodGVR).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
 }
 
-// GetDynamicClient returns the underlying dynamic client for advanced operations
-func (kc *KubeClient) GetDynamicClient() dynamic.Interface {
-	return kc.dynamic
+func (kc *KubeClient) CreatePod(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(PodGVR).Namespace(obj.GetNamespace()).Create(ctx, obj, metav1.CreateOptions{})
+}
+
+func (kc *KubeClient) DeletePod(ctx context.Context, namespace, name string, opts *metav1.DeleteOptions) error {
+	if opts == nil {
+		opts = &metav1.DeleteOptions{}
+	}
+	return kc.dynamic.Resource(PodGVR).Namespace(namespace).Delete(ctx, name, *opts)
+}
+
+func (kc *KubeClient) DeletePodsByLabel(ctx context.Context, namespace, labelSelector string) error {
+	return kc.dynamic.Resource(PodGVR).Namespace(namespace).DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{LabelSelector: labelSelector})
+}
+
+// Service operations
+func (kc *KubeClient) GetService(ctx context.Context, namespace, name string) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(ServiceGVR).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+}
+
+func (kc *KubeClient) CreateService(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(ServiceGVR).Namespace(obj.GetNamespace()).Create(ctx, obj, metav1.CreateOptions{})
+}
+
+func (kc *KubeClient) DeleteServicesByLabel(ctx context.Context, namespace, labelSelector string) error {
+	return kc.dynamic.Resource(ServiceGVR).Namespace(namespace).DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{LabelSelector: labelSelector})
+}
+
+// Secret operations
+func (kc *KubeClient) GetSecret(ctx context.Context, namespace, name string) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(SecretGVR).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+}
+
+func (kc *KubeClient) CreateSecret(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(SecretGVR).Namespace(obj.GetNamespace()).Create(ctx, obj, metav1.CreateOptions{})
+}
+
+func (kc *KubeClient) DeleteSecretsByLabel(ctx context.Context, namespace, labelSelector string) error {
+	return kc.dynamic.Resource(SecretGVR).Namespace(namespace).DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{LabelSelector: labelSelector})
+}
+
+// ServiceAccount operations
+func (kc *KubeClient) GetServiceAccount(ctx context.Context, namespace, name string) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(ServiceAccountGVR).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+}
+
+func (kc *KubeClient) CreateServiceAccount(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(ServiceAccountGVR).Namespace(obj.GetNamespace()).Create(ctx, obj, metav1.CreateOptions{})
+}
+
+func (kc *KubeClient) DeleteServiceAccountsByLabel(ctx context.Context, namespace, labelSelector string) error {
+	return kc.dynamic.Resource(ServiceAccountGVR).Namespace(namespace).DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{LabelSelector: labelSelector})
+}
+
+// Role operations
+func (kc *KubeClient) GetRole(ctx context.Context, namespace, name string) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(RoleGVR).Namespace(namespace).Get(ctx, name, metav1.GetOptions{})
+}
+
+func (kc *KubeClient) CreateRole(ctx context.Context, obj *unstructured.Unstructured) (*unstructured.Unstructured, error) {
+	return kc.dynamic.Resource(RoleGVR).Namespace(obj.GetNamespace()).Create(ctx, obj, metav1.CreateOptions{})
+}
+
+func (kc *KubeClient) DeleteRolesByLabel(ctx context.Context, namespace, labelSelector string) error {
+	return kc.dynamic.Resource(RoleGVR).Namespace(namespace).DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{LabelSelector: labelSelector})
+}
+
+func (kc *KubeClient) DeleteRoleBindingsByLabel(ctx context.Context, namespace, labelSelector string) error {
+	return kc.dynamic.Resource(RoleBindingGVR).Namespace(namespace).DeleteCollection(ctx, metav1.DeleteOptions{}, metav1.ListOptions{LabelSelector: labelSelector})
 }

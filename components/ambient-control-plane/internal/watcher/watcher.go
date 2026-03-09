@@ -12,6 +12,7 @@ import (
 	pb "github.com/ambient-code/platform/components/ambient-api-server/pkg/api/grpc/ambient/v1"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 type EventType string
@@ -33,17 +34,26 @@ type EventHandler func(ctx context.Context, event WatchEvent) error
 
 type WatchManager struct {
 	conn     *grpc.ClientConn
+	token    string
 	handlers map[string][]EventHandler
 	mu       sync.RWMutex
 	logger   zerolog.Logger
 }
 
-func NewWatchManager(conn *grpc.ClientConn, logger zerolog.Logger) *WatchManager {
+func NewWatchManager(conn *grpc.ClientConn, token string, logger zerolog.Logger) *WatchManager {
 	return &WatchManager{
 		conn:     conn,
+		token:    token,
 		handlers: make(map[string][]EventHandler),
 		logger:   logger.With().Str("component", "watcher").Logger(),
 	}
+}
+
+func (wm *WatchManager) authContext(ctx context.Context) context.Context {
+	if wm.token == "" {
+		return ctx
+	}
+	return metadata.NewOutgoingContext(ctx, metadata.Pairs("authorization", "Bearer "+wm.token))
 }
 
 func (wm *WatchManager) RegisterHandler(resource string, handler EventHandler) {
@@ -118,7 +128,7 @@ func (wm *WatchManager) watchOnce(ctx context.Context, resource string) error {
 
 func (wm *WatchManager) watchSessions(ctx context.Context) error {
 	client := pb.NewSessionServiceClient(wm.conn)
-	stream, err := client.WatchSessions(ctx, &pb.WatchSessionsRequest{})
+	stream, err := client.WatchSessions(wm.authContext(ctx), &pb.WatchSessionsRequest{})
 	if err != nil {
 		return err
 	}
@@ -145,7 +155,7 @@ func (wm *WatchManager) watchSessions(ctx context.Context) error {
 
 func (wm *WatchManager) watchProjects(ctx context.Context) error {
 	client := pb.NewProjectServiceClient(wm.conn)
-	stream, err := client.WatchProjects(ctx, &pb.WatchProjectsRequest{})
+	stream, err := client.WatchProjects(wm.authContext(ctx), &pb.WatchProjectsRequest{})
 	if err != nil {
 		return err
 	}
@@ -172,7 +182,7 @@ func (wm *WatchManager) watchProjects(ctx context.Context) error {
 
 func (wm *WatchManager) watchProjectSettings(ctx context.Context) error {
 	client := pb.NewProjectSettingsServiceClient(wm.conn)
-	stream, err := client.WatchProjectSettings(ctx, &pb.WatchProjectSettingsRequest{})
+	stream, err := client.WatchProjectSettings(wm.authContext(ctx), &pb.WatchProjectSettingsRequest{})
 	if err != nil {
 		return err
 	}

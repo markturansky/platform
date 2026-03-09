@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 type ControlPlaneConfig struct {
@@ -13,6 +14,7 @@ type ControlPlaneConfig struct {
 	LogLevel       string
 	Kubeconfig     string
 	Mode           string
+	Reconcilers    []string
 }
 
 func Load() (*ControlPlaneConfig, error) {
@@ -24,6 +26,7 @@ func Load() (*ControlPlaneConfig, error) {
 		LogLevel:       envOrDefault("LOG_LEVEL", "info"),
 		Kubeconfig:     os.Getenv("KUBECONFIG"),
 		Mode:           envOrDefault("MODE", "kube"),
+		Reconcilers:    parseReconcilers(envOrDefault("RECONCILERS", "tally")),
 	}
 
 	if cfg.APIToken == "" {
@@ -44,4 +47,25 @@ func envOrDefault(key, fallback string) string {
 		return v
 	}
 	return fallback
+}
+
+func parseReconcilers(reconcilersStr string) []string {
+	if reconcilersStr == "" {
+		return []string{"tally"}
+	}
+
+	reconcilers := strings.Split(reconcilersStr, ",")
+	var result []string
+	for _, r := range reconcilers {
+		r = strings.TrimSpace(r)
+		if r != "" {
+			result = append(result, r)
+		}
+	}
+
+	if len(result) == 0 {
+		return []string{"tally"}
+	}
+
+	return result
 }
